@@ -1,12 +1,12 @@
 # Getting Started
 
-One of the main goals of the **CMaNGOS Docker** project is **optimization**.
+One of the main goals of the **CMaNGOS Docker** project is **optimization**.  
 To achieve this, **two different types** of Docker images have been developed: one used for **maintenance** (larger) and one used for **execution** (smaller and optimized).
 
 With this principle in mind, we can now begin!
 
 ::: warning Not production-ready
-This procedure doesn't describe a _production-ready_ deployment and doesn't delve into security best practices.
+This procedure doesn't describe a _production-ready_ deployment and doesn't delve into security best practices.  
 It's just a simple practical example of a basic CMaNGOS Docker configuration; be careful when using it directly in a production environment.
 
 If you're looking for more specific guidance, see the [Use in Production](/guide/use-in-production) page.
@@ -14,7 +14,7 @@ If you're looking for more specific guidance, see the [Use in Production](/guide
 
 ## First time setup
 
-First of all, you have to decide which client version you want your server to support.
+First of all, you have to decide which client version you want your server to support.  
 Both CMaNGOS and CMaNGOS Docker use **three keywords** to identify it. Select the one you need and **keep it in mind** for the next steps:
 
 | Game name | Game version | Keyword |
@@ -27,7 +27,7 @@ Both CMaNGOS and CMaNGOS Docker use **three keywords** to identify it. Select th
 
 ### Create a project directory
 
-Create a new directory on your computer to store everything related to your WoW server.
+Create a new directory on your computer to store everything related to your WoW server.  
 It's best **NOT** to use the same directory as the client — keep them separate from each other.
 
 Download the [`cmangos-docker.zip`](https://github.com/Byloth/cmangos-docker/archive/refs/heads/master.zip) archive, open it, and extract its contents into the newly created directory.
@@ -44,14 +44,14 @@ This archive may be updated over time. Make sure to check it periodically and fo
 
 To play World of Warcraft, you'll need a legally owned copy of the game installed on your computer.
 
-Locate the installation directory. On Windows, the default location is typically `C:\Program Files\World of Warcraft`.
+Locate the installation directory. On Windows, the default location is typically `C:\Program Files\World of Warcraft`.  
 Once you find it, copy the path — we'll need it shortly.
 
 ### Create the `.env` file
 
 The `.env` file is a configuration file that allows you to customize your WoW server.
 
-Although it's required for the application to work properly, it cannot be included pre-configured due to its nature. This means you'll need to create it yourself.
+Although it's required for the application to work properly, it cannot be included pre-configured due to its nature. This means you'll need to create it yourself.  
 To simplify this process, there's a `.env.example` file that you can copy and modify using any text editor (e.g., Notepad) to suit your needs.
 
 It contains 6 key-value pairs. Here's what each one means:
@@ -71,35 +71,35 @@ Once you're done, save the file and close your text editor.
 
 Due to legal reasons and copyright policies, CMaNGOS (and CMaNGOS Docker) cannot be distributed in a fully _ready-to-run_ state. It requires **some additional copyrighted files** from Blizzard Entertainment.
 
-Fortunately, these files are present within the WoW client — the same client you need to play the game.
+Fortunately, these files are present within the WoW client — the same client you need to play the game.  
 If you've legally purchased a copy, you can use a CMaNGOS tool to extract these files directly from it.
 
 ::: code-group
 
-```sh [Unix/Linux/macOS]
+```sh [Linux / Unix / macOS]
 ./builder/run.sh extract
 ```
 
 ```bat [Windows Command Prompt]
 docker run -it --rm ^
            --volume "cmangos_mangosd_data:/home/mangos/data" ^
-           --volume "<path>:/home/mangos/wow-client" ^
+           --volume "{path}:/home/mangos/wow-client" ^
     ^
-    ghcr.io/byloth/cmangos/<version>/builder:latest extract
+    ghcr.io/byloth/cmangos/{version}/builder:latest extract
 ```
 
 ```powershell [Windows PowerShell]
 docker run -it --rm `
            --volume "cmangos_mangosd_data:/home/mangos/data" `
-           --volume "<path>:/home/mangos/wow-client" `
+           --volume "{path}:/home/mangos/wow-client" `
     `
-    ghcr.io/byloth/cmangos/<version>/builder:latest extract
+    ghcr.io/byloth/cmangos/{version}/builder:latest extract
 ```
 
 :::
 
 ::: warning Placeholders
-For Windows users: replace `<path>` with your WoW installation directory path and `<version>` with your chosen expansion keyword (`classic`, `tbc`, or `wotlk`).
+For Windows users: replace `{path}` with your WoW installation directory path and `{version}` with your chosen expansion keyword (`classic`, `tbc`, or `wotlk`).
 :::
 
 ## Database initialization
@@ -118,7 +118,7 @@ Open a terminal inside the server project directory you created earlier and run:
 docker compose up mariadb
 ```
 
-This terminal will now display log output and won't be interactive.
+This terminal will now display log output and won't be interactive.  
 As long as it's printing messages, the database server is running. Leave it running and open a **new terminal** in the same directory.
 
 In the new terminal, run:
@@ -139,7 +139,7 @@ docker run -it --rm ^
            --network "cmangos_default" ^
            --volume "cmangos_mangosd_data:/home/mangos/data" ^
     ^
-    ghcr.io/byloth/cmangos/<version>/builder:latest init-db
+    ghcr.io/byloth/cmangos/{version}/builder:latest init-db
 ```
 
 ```powershell [Windows PowerShell]
@@ -152,21 +152,21 @@ docker run -it --rm `
            --network "cmangos_default" `
            --volume "cmangos_mangosd_data:/home/mangos/data" `
     `
-    ghcr.io/byloth/cmangos/<version>/builder:latest init-db
+    ghcr.io/byloth/cmangos/{version}/builder:latest init-db
 ```
 
 :::
 
 ::: warning Placeholders
-For Windows users: don't forget to replace `<version>` with the correct expansion keyword.
+For Windows users: don't forget to replace `{version}` with the correct expansion keyword.
 :::
 
-Once the initialization is complete, go back to the first terminal (which should still be running) and press `Ctrl+C` to stop the database server.
+Once the initialization is complete, go back to the first terminal (which should still be running) and press `Ctrl+C` to stop the database server.  
 This will cause the program to print some shutdown messages, and execution will stop within a few seconds.
 
 ### Configure the realmlist
 
-The last step before starting the server is to tell the client which realms exist and where to find them.
+The last step before starting the server is to tell the client which realms exist and where to find them.  
 CMaNGOS applies a basic configuration by default that should work for a single-realm server running on the local machine.
 
 However, if your scenario is different — or if you find yourself in a loop where the WoW client repeatedly asks you to select a realm — you'll need to configure the `realmlist` table in the `realmd` database.
@@ -181,7 +181,7 @@ VALUES ('1', 'CMaNGOS', '127.0.0.1', '8085', '1', '0', '1', '0');
 ```
 
 ::: tip Customizing the realm
-You'll likely want to customize the `name`, `address`, and `port` columns to match your setup.
+You'll likely want to customize the `name`, `address`, and `port` columns to match your setup.  
 The other fields (`realmflags` and `timezone`) can also be configured via the `mangosd.conf` file.
 :::
 
@@ -203,7 +203,7 @@ As before, this terminal will no longer be interactive. As long as it prints mes
 
 ### Using the CMaNGOS console
 
-The CMaNGOS server provides a command-line interface where you can manage users and the server itself.
+The CMaNGOS server provides a command-line interface where you can manage users and the server itself.  
 You won't need this during normal operation, but it's useful for tasks like creating user accounts.
 
 While your CMaNGOS server is running, you can access the console by running in a new terminal:
@@ -225,16 +225,16 @@ To properly detach from the console, press `Ctrl+P` followed by `Ctrl+Q`.
 To create a new account, type the following command in the CMaNGOS console:
 
 ```sh
-account create <username> <password>
+account create {username} <password>
 ```
 
-Replace `<username>` and `<password>` with your desired credentials.
+Replace `{username}` and `<password>` with your desired credentials.
 
 ### Enabling expansions for an account
 
 Regardless of which expansion your CMaNGOS server supports, you can choose for each individual account which expansion content they can access.
 
-This works just like official WoW servers: when a new expansion is released, the server supports it, but players can only access the new content after purchasing it.
+This works just like official WoW servers: when a new expansion is released, the server supports it, but players can only access the new content after purchasing it.  
 This setting allows you to implement the same behavior.
 
 | Game name | Game version | Level |
@@ -244,15 +244,17 @@ This setting allows you to implement the same behavior.
 | World of Warcraft: Wrath of the Lich King | **v3.3.5a** | `2` |
 
 ::: info Expansion levels are cumulative
-A higher level automatically includes all previous expansions.
+A higher level automatically includes all previous expansions.  
 For example, setting level `2` (WotLK) also grants access to TBC and Classic content.
 :::
 
 To set the expansion level for an account:
 
 ```sh
-account set addon <username> <level>
+account set addon {username} {level}
 ```
+
+Replace `{username}` and `{level}` with the desired values.
 
 ### Setting GM levels
 
@@ -268,12 +270,14 @@ Game Masters (GMs) can perform various administrative actions depending on their
 To change the GM level for an account:
 
 ```sh
-account set gmlevel <username> <level>
+account set gmlevel {username} {level}
 ```
+
+Replace `{username}` and `{level}` with the desired values.
 
 ## Stopping the server
 
-To stop the server gracefully, press `Ctrl+C` in the terminal where the CMaNGOS server is running.
+To stop the server gracefully, press `Ctrl+C` in the terminal where the CMaNGOS server is running.  
 This may take a few seconds, but the server will shut down properly.
 
 ::: tip Ensuring a clean shutdown

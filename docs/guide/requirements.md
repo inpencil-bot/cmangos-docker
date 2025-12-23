@@ -12,7 +12,7 @@ These topics won't be covered in this documentation; however, any other software
 
 ### Installation
 
-To install Docker, visit the official [**download page**](https://docs.docker.com/get-docker/) and select your operating system.
+To install Docker, visit the official [**download page**](https://docs.docker.com/get-docker/) and select your operating system.  
 The installer will begin downloading; once complete, run it and follow the prompts.
 
 ### Verifying the installation

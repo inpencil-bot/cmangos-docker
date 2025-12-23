@@ -4,14 +4,14 @@
 This page is currently under construction and may be incomplete.
 :::
 
-In this section, we'll cover how to configure the CMaNGOS server using Docker containers.
+In this section, we'll cover how to configure the CMaNGOS server using Docker containers.  
 Configuration values are injected into the container through a directory mounted as a volume.
 
 As a user of CMaNGOS Docker, you'll simply need to edit the configuration file located at `runner/config/mangosd.conf`.
 
 ## Configuration file
 
-This configuration file doesn't contain all available properties and settings for CMaNGOS.
+This configuration file doesn't contain all available properties and settings for CMaNGOS.  
 By default, CMaNGOS has its own default values for everything — you only need to add entries for settings you want to override.
 
 ### Overriding default values

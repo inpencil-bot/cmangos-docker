@@ -4,11 +4,11 @@
 This page is currently under construction and may be incomplete.
 :::
 
-CMaNGOS Docker images are built and published nightly, incorporating the latest changes from the CMaNGOS project.
+CMaNGOS Docker images are built and published nightly, incorporating the latest changes from the CMaNGOS project.  
 This guide explains how to update your server to the latest version.
 
 ::: danger Always backup first!
-Before installing any updates, **always** create a [backup](/guide/database-management#creating-a-backup) of your databases.
+Before installing any updates, **always** create a [backup](/guide/database-management#creating-a-backup) of your databases.  
 Updates can occasionally cause issues, and having a recent backup ensures you can recover your data.
 :::
 
@@ -80,10 +80,10 @@ docker compose up -d
 To see which version of CMaNGOS your images were built from, you can inspect the image labels:
 
 ```sh
-docker inspect ghcr.io/byloth/cmangos/<version>:latest --format='{{.Config.Labels}}'
+docker inspect ghcr.io/byloth/cmangos/{version}:latest --format='{{.Config.Labels}}'
 ```
 
-Replace `<version>` with your expansion keyword (`classic`, `tbc`, or `wotlk`).
+Replace `{version}` with your expansion keyword (`classic`, `tbc`, or `wotlk`).
 
 ## Rollback
 
@@ -93,8 +93,10 @@ If an update causes problems, you can roll back to a previous version:
 2. Pull a specific dated image tag:
 
 ```sh
-docker pull ghcr.io/byloth/cmangos/<version>:2024-01-14
+docker pull ghcr.io/byloth/cmangos/{version}:2024-01-14
 ```
+
+Replace `{version}` with your expansion keyword (`classic`, `tbc`, or `wotlk`).
 
 3. Update your `docker-compose.yml` to use the specific tag instead of `latest`
 4. Restart the server

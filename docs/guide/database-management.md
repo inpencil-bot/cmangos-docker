@@ -4,7 +4,7 @@
 This page is currently under construction and may be incomplete.
 :::
 
-CMaNGOS uses a MariaDB database to store all game data, player characters, and server logs.
+CMaNGOS uses a MariaDB database to store all game data, player characters, and server logs.  
 This guide covers common database operations like backups, restores, and running queries.
 
 ## Prerequisites
@@ -70,7 +70,7 @@ Choose the one that best suits your needs.
 
 ### Using phpMyAdmin
 
-phpMyAdmin is included in CMaNGOS Docker but is disabled by default.
+phpMyAdmin is included in CMaNGOS Docker but is disabled by default.  
 To run it, you can either start it manually or use the `debug` profile.
 
 ::: code-group
@@ -97,38 +97,40 @@ For command-line access, you can use the `builder` container to run MySQL comman
 
 ::: code-group
 
-```sh [Unix/Linux/macOS — Single query]
-./builder/run.sh mysql -u root -p <database> -e "SELECT * FROM realmlist;"
+```sh [Linux / Unix / macOS]
+# Execute a single inline query
+./builder/run.sh mysql -u root -p {database} -e "SELECT * FROM realmlist;"
+
+# Execute queries from a file
+./builder/run.sh mysql -u root -p {database} < path/to/queries.sql
 ```
 
-```sh [Unix/Linux/macOS — SQL file]
-./builder/run.sh mysql -u root -p <database> < path/to/queries.sql
-```
-
-```bat [Windows Command Prompt — Single query]
+```bat [Windows Command Prompt]
+:: Execute a single inline query
 docker run -it --rm ^
            --network "cmangos_default" ^
     ^
-    ghcr.io/byloth/cmangos/<version>/builder:latest mysql -u root -p <database> -e "SELECT * FROM realmlist;"
+    ghcr.io/byloth/cmangos/{version}/builder:latest mysql -u root -p {database} -e "SELECT * FROM realmlist;"
 ```
 
-```powershell [Windows PowerShell — Single query]
+```powershell [Windows PowerShell]
+# Execute a single inline query
 docker run -it --rm `
            --network "cmangos_default" `
     `
-    ghcr.io/byloth/cmangos/<version>/builder:latest mysql -u root -p <database> -e "SELECT * FROM realmlist;"
+    ghcr.io/byloth/cmangos/{version}/builder:latest mysql -u root -p {database} -e "SELECT * FROM realmlist;"
 ```
 
 :::
 
 ::: warning Placeholders
-Replace `<database>` with the name of the database you want to query:
+Replace `{database}` with the name of the database you want to query:
 - `classicmangos`, `tbcmangos`, or `wotlkmangos` — World data
 - `classiccharacters`, `tbccharacters`, or `wotlkcharacters` — Character data
 - `classiclogs`, `tbclogs`, or `wotlklogs` — Log data
 - `classicrealmd`, `tbcrealmd`, or `wotlkrealmd` — Realm data
 
-For Windows users, also replace `<version>` with your expansion keyword.
+For Windows users, also replace `{version}` with your expansion keyword.
 :::
 
 ## Database structure
