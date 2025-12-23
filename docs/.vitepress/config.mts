@@ -32,15 +32,36 @@ export default defineConfig({
     logo: "/logo.png",
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/markdown-examples' }
+      { text: 'Guide', link: '/guide/introduction' }
     ],
 
     sidebar: [
       {
-        text: 'Examples',
+        text: 'Getting Started',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Introduction', link: '/guide/introduction' },
+          { text: 'Requirements', link: '/guide/requirements' },
+          { text: 'Getting Started', link: '/guide/getting-started' }
+        ]
+      },
+      {
+        text: 'Configuration',
+        items: [
+          { text: 'Server Configuration', link: '/guide/server-configuration' },
+          { text: 'Database Management', link: '/guide/database-management' }
+        ]
+      },
+      {
+        text: 'Maintenance',
+        items: [
+          { text: 'Installing Updates', link: '/guide/install-updates' }
+        ]
+      },
+      {
+        text: 'Advanced',
+        items: [
+          { text: 'Customization', link: '/guide/customization' },
+          { text: 'Use in Production', link: '/guide/use-in-production' }
         ]
       }
     ],
@@ -49,17 +70,38 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/Byloth/cmangos-docker' }
     ],
     footer: {
-      message: `Rilasciato sotto
+      message: `Released under the
 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer nofollow">
-  Licenza CC BY-SA 4.0</a>.`,
+  CC BY-SA 4.0 License</a>.`,
       copyright: `Copyright © 2014-${new Date().getFullYear()}
 <a href="https://github.com/Byloth">
   Matteo Bilotta</a>.`
+    },
+
+    editLink: {
+      pattern: 'https://github.com/Byloth/cmangos-docker/edit/master/docs/:path',
+      text: 'Edit this page on GitHub'
+    },
+
+    search: {
+      provider: 'local'
+    },
+
+    lastUpdated: {
+      text: 'Last updated',
+      formatOptions: {
+        dateStyle: 'medium'
+      }
     }
   },
   vite: {
     resolve: {
       alias: { "@": fileURLToPath(new URL("../src", import.meta.url)) }
     }
-  }
+  },
+  lastUpdated: true,
+  ignoreDeadLinks: [
+    // Ignore localhost links (they're examples for the user)
+    /^http:\/\/localhost/
+  ]
 })

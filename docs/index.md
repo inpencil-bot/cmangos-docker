@@ -13,10 +13,10 @@ hero:
   actions:
     - theme: brand
       text: Getting Started
-      link: /getting-started
+      link: /guide/getting-started
     - theme: alt
       text: Why use Docker?
-      link: /why-docker
+      link: /guide/introduction#why-use-docker
     - theme: alt
       text: GitHub
       link: https://github.com/Byloth/cmangos-docker
