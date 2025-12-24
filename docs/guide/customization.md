@@ -1,7 +1,8 @@
 # Customization
 
 ::: warning Coming Soon
-This page is a placeholder. Content will be added in a future update.
+This page is a placeholder.  
+Content will be added in a future update.
 :::
 
 This section will cover advanced customization options for your CMaNGOS Docker server, including:

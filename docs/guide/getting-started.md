@@ -1,21 +1,22 @@
 # Getting Started
 
-One of the main goals of the **CMaNGOS Docker** project is **optimization**.  
+One of the main goals of the **CMaNGOS Docker** project is **optimization**.
 To achieve this, **two different types** of Docker images have been developed: one used for **maintenance** (larger) and one used for **execution** (smaller and optimized).
 
 With this principle in mind, we can now begin!
 
 ::: warning Not production-ready
-This procedure doesn't describe a _production-ready_ deployment and doesn't delve into security best practices.  
-It's just a simple practical example of a basic CMaNGOS Docker configuration; be careful when using it directly in a production environment.
+This procedure doesn't describe a _production-ready_ deployment and doesn't delve into security best practices. It's just a simple practical example of a basic CMaNGOS Docker configuration; be careful when using it directly in a production environment.
 
 If you're looking for more specific guidance, see the [Use in Production](/guide/use-in-production) page.
 :::
 
-## First time setup
+## Choose your expansion
 
 First of all, you have to decide which client version you want your server to support.  
-Both CMaNGOS and CMaNGOS Docker use **three keywords** to identify it. Select the one you need and **keep it in mind** for the next steps:
+Both CMaNGOS and CMaNGOS Docker use **three keywords** to identify it.
+
+Select the one you need and **keep it in mind** for the next steps:
 
 | Game name | Game version | Keyword |
 |-----------|--------------|---------|
@@ -23,56 +24,63 @@ Both CMaNGOS and CMaNGOS Docker use **three keywords** to identify it. Select th
 | World of Warcraft: The Burning Crusade | **v2.4.3** | `tbc` |
 | World of Warcraft: Wrath of the Lich King | **v3.3.5a** | `wotlk` |
 
-## Preliminary configuration
-
-### Create a project directory
+## Download the project
 
 Create a new directory on your computer to store everything related to your WoW server.  
-It's best **NOT** to use the same directory as the client — keep them separate from each other.
+It's best **NOT** to use the same directory as the game client — keep them separate from each other.
 
 Download the [`cmangos-docker.zip`](https://github.com/Byloth/cmangos-docker/archive/refs/heads/master.zip) archive, open it, and extract its contents into the newly created directory.
 
 ::: tip Using Git
-If you're familiar with [Git](https://git-scm.com/), you can clone the repository directly instead of downloading the archive.
+If you're familiar with [Git](https://git-scm.com/), you can clone the repository directly instead of downloading the archive:
+
+```sh
+git clone https://github.com/Byloth/cmangos-docker.git
+```
 :::
 
 ::: info Keeping files up to date
-This archive may be updated over time. Make sure to check it periodically and follow the [update procedure](/guide/install-updates) when needed.
+This archive may be updated over time.  
+Make sure to check it periodically and follow the [update procedure](/guide/install-updates) when needed.
 :::
 
-### Locate the client directory
+## Locate the game client
 
 To play World of Warcraft, you'll need a legally owned copy of the game installed on your computer.
 
 Locate the installation directory. On Windows, the default location is typically `C:\Program Files\World of Warcraft`.  
-Once you find it, copy the path — we'll need it shortly.
+Once you find it, copy the full path — we'll need it in the next step.
 
-### Create the `.env` file
+## Configure the environment
 
-The `.env` file is a configuration file that allows you to customize your WoW server.
+The `.env` file is a configuration file that customizes your WoW server setup.
 
-Although it's required for the application to work properly, it cannot be included pre-configured due to its nature. This means you'll need to create it yourself.  
-To simplify this process, there's a `.env.example` file that you can copy and modify using any text editor (e.g., Notepad) to suit your needs.
+Since it contains sensitive information (like passwords), it cannot be included pre-configured. To create it, copy the `.env.example` file and rename it to `.env`, then edit it with any text editor.
 
-It contains 6 key-value pairs. Here's what each one means:
+### Environment variables
 
-| Variable | Description |
-|----------|-------------|
-| `MYSQL_SUPERPASS` | The password for the `root` user that will be used to administer the MySQL database. |
-| `MANGOS_DBUSER` | The username of the user that the application server will use to connect to the MySQL database. |
-| `MANGOS_DBPASS` | The password of the user that the application server will use to connect to the MySQL database. |
-| `WOW_CLIENT_DIR` | The path to the WoW installation directory you located in the previous step. |
-| `WOW_TIMEZONE` | The [time zone identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) that specifies which time zone the server should use. |
-| `WOW_VERSION` | The keyword that describes which version of WoW client the server should support (the one you chose in the first step). |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `MYSQL_SUPERPASS` | Password for the MySQL `root` administrator account | `root00` |
+| `MANGOS_DBUSER` | Username for the application's database connection | `mangos` |
+| `MANGOS_DBPASS` | Password for the application's database connection | `mangos00` |
+| `WOW_CLIENT_DIR` | Full path to your WoW game installation | `D:\Games\WoW` |
+| `WOW_TIMEZONE` | Server timezone ([tz database format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) | `Europe/Rome` |
+| `WOW_VERSION` | Expansion keyword from the table above | `tbc` |
+
+::: danger Security notice
+Choose strong, unique passwords for `MYSQL_SUPERPASS` and `MANGOS_DBPASS`.  
+The example values (`root00`, `mangos00`) are **not secure** and should only be used for local testing.
+:::
 
 Once you're done, save the file and close your text editor.
 
-### Extract files from the client
+## Extract game data
 
-Due to legal reasons and copyright policies, CMaNGOS (and CMaNGOS Docker) cannot be distributed in a fully _ready-to-run_ state. It requires **some additional copyrighted files** from Blizzard Entertainment.
+Due to legal reasons and copyright policies, CMaNGOS cannot be distributed in a fully _ready-to-run_ state. It requires **additional data files** that are copyrighted by Blizzard Entertainment.
 
-Fortunately, these files are present within the WoW client — the same client you need to play the game.  
-If you've legally purchased a copy, you can use a CMaNGOS tool to extract these files directly from it.
+These files are present within the WoW game client.  
+If you legally own the game, you can extract them using the CMaNGOS extraction tool.
 
 ::: code-group
 
@@ -102,30 +110,28 @@ docker run -it --rm `
 For Windows users: replace `{path}` with your WoW installation directory path and `{version}` with your chosen expansion keyword (`classic`, `tbc`, or `wotlk`).
 :::
 
-## Database initialization
-
-Since this is the first run, you need to create the databases and load the initial data required by CMaNGOS to function correctly.
-
-::: info What's in the database?
-The database contains information about NPCs, mobs, items, spells, quests, events, and their related stats such as strength, speed, hit points, spawn rates, drop ratios, experience, gold, and more.
-
-If you find something that seems wrong or missing while playing, feel free to [report it](https://github.com/cmangos/issues/issues/new/choose) to the CMaNGOS team.
+::: info Extraction time
+This process extracts maps, textures, and other game data.  
+Depending on your hardware, it may take **30 minutes to several hours** to complete.
 :::
 
-Open a terminal inside the server project directory you created earlier and run:
+## Initialize the database
+
+The database stores all game world information: NPCs, items, quests, spells, and much more. This step creates the required databases and populates them with initial data.
+
+Open a terminal in your project directory and start the database server:
 
 ```sh
 docker compose up mariadb
 ```
 
-This terminal will now display log output and won't be interactive.  
-As long as it's printing messages, the database server is running. Leave it running and open a **new terminal** in the same directory.
+This terminal will display log output. Leave it running and open a **second terminal** in the same directory.
 
-In the new terminal, run:
+In the second terminal, initialize the databases:
 
 ::: code-group
 
-```sh [Unix/Linux/macOS]
+```sh [Linux / Unix / macOS]
 ./builder/run.sh init-db
 ```
 
@@ -158,40 +164,14 @@ docker run -it --rm `
 :::
 
 ::: warning Placeholders
-For Windows users: don't forget to replace `{version}` with the correct expansion keyword.
+For Windows users: replace `{version}` with the correct expansion keyword and update the environment variable values to match your `.env` file.
 :::
 
-Once the initialization is complete, go back to the first terminal (which should still be running) and press `Ctrl+C` to stop the database server.  
-This will cause the program to print some shutdown messages, and execution will stop within a few seconds.
+Once initialization completes, return to the first terminal and press `Ctrl+C` to stop the database server.
 
-### Configure the realmlist
+## Start the server
 
-The last step before starting the server is to tell the client which realms exist and where to find them.  
-CMaNGOS applies a basic configuration by default that should work for a single-realm server running on the local machine.
-
-However, if your scenario is different — or if you find yourself in a loop where the WoW client repeatedly asks you to select a realm — you'll need to configure the `realmlist` table in the `realmd` database.
-
-Run these SQL queries to fix the issue:
-
-```sql
-DELETE FROM realmlist WHERE id = 1;
-
-INSERT INTO realmlist (id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel)
-VALUES ('1', 'CMaNGOS', '127.0.0.1', '8085', '1', '0', '1', '0');
-```
-
-::: tip Customizing the realm
-You'll likely want to customize the `name`, `address`, and `port` columns to match your setup.  
-The other fields (`realmflags` and `timezone`) can also be configured via the `mangosd.conf` file.
-:::
-
-::: info Running SQL queries
-If you're not sure how to run these queries, see the [Database Management](/guide/database-management#querying-databases) page.
-:::
-
-## Running the server
-
-Once you've initialized the database, you're ready to run your very own WoW server for the first time!
+You're now ready to run your WoW server for the first time!
 
 From your project directory, run:
 
@@ -199,91 +179,60 @@ From your project directory, run:
 docker compose up
 ```
 
-As before, this terminal will no longer be interactive. As long as it prints messages, your CMaNGOS server is up and running.
+The terminal will display server logs. As long as messages are being printed, your server is running.
 
-### Using the CMaNGOS console
-
-The CMaNGOS server provides a command-line interface where you can manage users and the server itself.  
-You won't need this during normal operation, but it's useful for tasks like creating user accounts.
-
-While your CMaNGOS server is running, you can access the console by running in a new terminal:
+::: tip Running in background
+To run the server in the background (detached mode), add the `-d` flag:
 
 ```sh
-docker attach cmangos-mangosd-1
+docker compose up -d
 ```
 
-Now you can type CMaNGOS commands.
-
-::: danger Exiting the console safely
-**DO NOT** press `Ctrl+C` to exit the console — this will stop the server entirely and disconnect all players.
-
-To properly detach from the console, press `Ctrl+P` followed by `Ctrl+Q`.
+You can then view logs with `docker compose logs -f` and stop with `docker compose down`.
 :::
 
-### Creating a new account
+## Connect to your server
 
-To create a new account, type the following command in the CMaNGOS console:
+To play on your server, you need to configure the WoW client to connect to it.
 
-```sh
-account create {username} <password>
+### Edit realmlist.wtf
+
+Locate the `realmlist.wtf` file inside your WoW client's `Data` directory and open it with a text editor.
+
+Replace its contents with:
+
+```
+set realmlist 127.0.0.1
 ```
 
-Replace `{username}` and `<password>` with your desired credentials.
-
-### Enabling expansions for an account
-
-Regardless of which expansion your CMaNGOS server supports, you can choose for each individual account which expansion content they can access.
-
-This works just like official WoW servers: when a new expansion is released, the server supports it, but players can only access the new content after purchasing it.  
-This setting allows you to implement the same behavior.
-
-| Game name | Game version | Level |
-|-----------|--------------|-------|
-| World of Warcraft | **v1.12.x** | `0` |
-| World of Warcraft: The Burning Crusade | **v2.4.3** | `1` |
-| World of Warcraft: Wrath of the Lich King | **v3.3.5a** | `2` |
-
-::: info Expansion levels are cumulative
-A higher level automatically includes all previous expansions.  
-For example, setting level `2` (WotLK) also grants access to TBC and Classic content.
+::: info Remote connections
+If you're connecting from a different computer on your network, replace `127.0.0.1` with the server machine's IP address.  
+For internet connections, you'll need to configure port forwarding on your router.
 :::
 
-To set the expansion level for an account:
+### Create an account
 
-```sh
-account set addon {username} {level}
-```
+Before you can log in, you need to create a game account.  
+See the [Server Administration](/guide/server-administration) guide for instructions on creating accounts and managing users.
 
-Replace `{username}` and `{level}` with the desired values.
+## Stop the server
 
-### Setting GM levels
+To stop the server gracefully, press `Ctrl+C` in the terminal where it's running.  
+This may take a few seconds as the server saves data and disconnects players.
 
-Game Masters (GMs) can perform various administrative actions depending on their level, such as banning players or teleporting stranded characters.
-
-| GM type | Level |
-|---------|-------|
-| Normal Player | `0` |
-| Moderator | `1` |
-| Game Master | `2` |
-| Administrator | `3` |
-
-To change the GM level for an account:
-
-```sh
-account set gmlevel {username} {level}
-```
-
-Replace `{username}` and `{level}` with the desired values.
-
-## Stopping the server
-
-To stop the server gracefully, press `Ctrl+C` in the terminal where the CMaNGOS server is running.  
-This may take a few seconds, but the server will shut down properly.
-
-::: tip Ensuring a clean shutdown
-To make sure everything was shut down properly, you can run:
+::: tip Clean shutdown
+To ensure everything is properly stopped:
 
 ```sh
 docker compose down
 ```
 :::
+
+## Next steps
+
+Now that your server is running, you may want to:
+
+- [Create user accounts](/guide/server-administration#creating-accounts) to log into the game
+- [Configure server settings](/guide/server-configuration) like experience rates or PvP rules
+- [Set up the realm list](/guide/server-configuration#realm-configuration) for proper client connections
+- [Learn about backups](/guide/database-management#backups) to protect your data

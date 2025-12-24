@@ -15,8 +15,8 @@ hero:
       text: Getting Started
       link: /guide/getting-started
     - theme: alt
-      text: Why use Docker?
-      link: /guide/introduction#why-use-docker
+      text: What's this?
+      link: /guide/introduction
     - theme: alt
       text: GitHub
       link: https://github.com/Byloth/cmangos-docker

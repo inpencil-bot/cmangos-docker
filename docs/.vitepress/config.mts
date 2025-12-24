@@ -45,8 +45,9 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Configuration',
+        text: 'Server Management',
         items: [
+          { text: 'Server Administration', link: '/guide/server-administration' },
           { text: 'Server Configuration', link: '/guide/server-configuration' },
           { text: 'Database Management', link: '/guide/database-management' }
         ]

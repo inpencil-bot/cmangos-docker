@@ -19,7 +19,8 @@ The `-d` flag runs the container in detached mode (background).
 
 ## Backups
 
-Regular backups are essential for protecting your server data. CMaNGOS Docker provides built-in tools for creating and restoring backups.
+Regular backups are essential for protecting your server data.  
+CMaNGOS Docker provides built-in tools for creating and restoring backups.
 
 ### Creating a backup
 
@@ -59,7 +60,8 @@ To restore from a backup file:
 ```
 
 ::: danger Destructive operation
-Restoring a backup will **overwrite** the current database contents. Make sure you have a recent backup of your current data before proceeding.
+Restoring a backup will **overwrite** the current database contents.  
+Make sure you have a recent backup of your current data before proceeding.
 :::
 
 ## Querying databases
@@ -88,7 +90,8 @@ docker compose --profile debug up
 After running one of these commands, visit [`http://localhost:8080`](http://localhost:8080) to access phpMyAdmin's graphical interface.
 
 ::: info Default credentials
-Use the database credentials from your `.env` file to log in. The root user is `root` with the password you set in `MYSQL_SUPERPASS`.
+Use the database credentials from your `.env` file to log in.  
+The root user is `root` with the password you set in `MYSQL_SUPERPASS`.
 :::
 
 ### Using the MySQL CLI
