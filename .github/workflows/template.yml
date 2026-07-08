@@ -47,7 +47,7 @@ jobs:
           echo DATABASE_SHA1="${DATABASE_SHA1}" >> "${GITHUB_ENV}" && \
           \
           echo TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "${GITHUB_ENV}" && \
-          echo VERSION_CODE="1.0.0-nightly+$(date -u +"%Y%m%d")" >> "${GITHUB_ENV}"
+          echo VERSION_CODE="1.1.0-nightly+$(date -u +"%Y%m%d")" >> "${GITHUB_ENV}"
 
       - name: Build & push the Docker images
         uses: docker/build-push-action@v7
@@ -111,7 +111,7 @@ jobs:
           echo DATABASE_SHA1="${DATABASE_SHA1}" >> "${GITHUB_ENV}" && \
           \
           echo TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "${GITHUB_ENV}" && \
-          echo VERSION_CODE="1.0.0-nightly+$(date -u +"%Y%m%d")" >> "${GITHUB_ENV}"
+          echo VERSION_CODE="1.1.0-nightly+$(date -u +"%Y%m%d")" >> "${GITHUB_ENV}"
 
       - name: Build & push the Docker images
         uses: docker/build-push-action@v7
