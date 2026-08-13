@@ -10,6 +10,7 @@ readonly NAME="cmangos-runner"
 readonly IMAGE="ghcr.io/byloth/cmangos/${WOW_VERSION}"
 readonly VERSION="latest"
 
+readonly CONFIG_DIR="${BASE_DIR}/runner/config"
 readonly DATA_VOLUME="cmangos_mangosd_data"
 readonly NETWORK="cmangos_default"
 
@@ -32,7 +33,7 @@ docker run ${TTY} \
            -p 7878:7878 \
            -p 8085:8085 \
            -p 8086:8086 \
-           -v "${PWD}/config":/opt/mangos/conf:ro \
+           -v "${CONFIG_DIR}":/opt/mangos/conf:ro \
            -v "${DATA_VOLUME}":/var/lib/mangos:ro \
     \
     "${IMAGE}:${VERSION}" ${@}
