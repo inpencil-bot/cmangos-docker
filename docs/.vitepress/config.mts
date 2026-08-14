@@ -49,7 +49,8 @@ export default defineConfig({
         items: [
           { text: 'Server Administration', link: '/guide/server-administration' },
           { text: 'Server Configuration', link: '/guide/server-configuration' },
-          { text: 'Database Management', link: '/guide/database-management' }
+          { text: 'Database Management', link: '/guide/database-management' },
+          { text: 'The cmangos_mangosd_data Volume', link: '/guide/volume' }
         ]
       },
       {

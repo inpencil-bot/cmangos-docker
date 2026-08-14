@@ -16,7 +16,7 @@ The main task for the CMaNGOS Docker project is to **maintain** and **provide** 
 
 Once you've got [Docker installed](/guide/requirements#installation) on your machine, you're done and ready to go!
 
-If it's the first time running the server, you may need some [initial configuration](/guide/getting-started#preliminary-configuration) to tell CMaNGOS how you want it to run...  
+If it's the first time running the server, you may need some [initial configuration](/guide/getting-started#configure-the-environment) to tell CMaNGOS how you want it to run...  
 But even this step is simple and straightforward.
 
 ## Why use Docker?
