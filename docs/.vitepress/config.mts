@@ -49,8 +49,7 @@ export default defineConfig({
         items: [
           { text: 'Server Administration', link: '/guide/server-administration' },
           { text: 'Server Configuration', link: '/guide/server-configuration' },
-          { text: 'Database Management', link: '/guide/database-management' },
-          { text: 'The cmangos_mangosd_data Volume', link: '/guide/volume' }
+          { text: 'Database Management', link: '/guide/database-management' }
         ]
       },
       {
@@ -64,6 +63,12 @@ export default defineConfig({
         items: [
           { text: 'Customization', link: '/guide/customization' },
           { text: 'Use in Production', link: '/guide/use-in-production' }
+        ]
+      },
+      {
+        text: 'Architecture',
+        items: [
+          { text: 'Docker Volumes', link: '/guide/docker-volumes' }
         ]
       }
     ],

@@ -4,7 +4,8 @@
 
 **CMaNGOS Docker** is a project that aims to provide the **best possible experience** to anyone interested in running their own [**CMaNGOS**](https://cmangos.net/) server.
 
-It doesn't matter if you're a **non-technical newcomer** who just wants to play with friends, a **skilled developer** who wants to experiment with the game world, or an **enterprise** looking to deploy multiple realms on a distributed server cluster... CMaNGOS Docker will **make things easy** for all of you!
+It doesn't matter if you're a **non-technical newcomer** who just wants to play with friends, a **skilled developer** who wants to experiment with the game world or an **enterprise** looking to deploy multiple realms on a distributed server cluster...  
+CMaNGOS Docker will **make things easy** for all of you!
 
 ## How does it work?
 
@@ -25,7 +26,7 @@ There are several advantages to using Docker containers over the traditional tec
 While I won't cover them all (since that isn't the focus of this document), here are the ones that interest us the most:
 
 - **No further installations required:**
-  You won't need to install any additional software, compilers, or libraries.
+  You won't need to install any additional software, compilers or libraries.
 
 - **No wasted disk space:**
   Docker executables take up around **500–600 MB**, while a typical CMaNGOS Docker image is less than **200 MB**.

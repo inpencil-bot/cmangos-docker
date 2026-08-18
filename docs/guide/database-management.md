@@ -1,17 +1,20 @@
 # Database Management
 
-CMaNGOS uses a MariaDB database to store all game data, player characters, and server logs.  
-This guide covers common database operations like backups, restores, running queries, and maintenance.
+CMaNGOS uses a MariaDB database to store all game data, player characters and server logs.  
+This guide covers common database operations like backups, restores, running queries and maintenance.
 
 ## Prerequisites
 
-Before performing any database operations, make sure the database server is running:
+All the maintenance commands on this page run inside the `builder` container and are shown in two flavors:
 
-```sh
-docker compose up mariadb -d
-```
+- **All platforms** — the `docker compose run` form; works identically on Windows, macOS and Linux.  
+  You don't even need to start the database server first: Docker Compose starts it automatically as a dependency and waits for it to be ready.
+- **\*nix shortcut** — the `./builder/run.sh` wrapper script; WSL, macOS and Linux only.  
+  It expects the database server to be already running:
 
-The `-d` flag runs the container in detached mode (background).
+  ```sh
+  docker compose up -d mariadb
+  ```
 
 ## Backups
 
@@ -24,23 +27,26 @@ From within your project directory, run:
 
 ::: code-group
 
-```sh [All databases]
-./builder/run.sh backup-db --all > backups/cmangos_$(date +"%Y-%m-%d_%H-%M-%S").tar.gz
+```sh [All platforms]
+docker compose run --rm -T builder backup-db > backups/cmangos_backup.tar.gz
 ```
 
-```sh [World database only]
-./builder/run.sh backup-db --world > backups/world_$(date +"%Y-%m-%d").tar.gz
-```
-
-```sh [Characters database only]
-./builder/run.sh backup-db --characters > backups/characters_$(date +"%Y-%m-%d").tar.gz
+```sh [*nix shortcut]
+./builder/run.sh backup-db > backups/cmangos_backup-$(date +"%Y_%m_%d-%H_%M_%S").tar.gz
 ```
 
 :::
 
+::: warning Binary output
+The backup is written to **standard output** as a binary archive.  
+In the `docker compose` form, the `-T` flag disables the pseudo-TTY, which would otherwise corrupt the binary stream — always use it when redirecting or piping the output of a builder command.  
+The shortcut script handles this automatically.
+
+On Windows, run these commands from the **Command Prompt**: PowerShell's redirection re-encodes the stream and corrupts binary data.
+:::
+
 ::: tip Backup options
 The `backup-db` command supports these flags:
-- `--all` — Backup all databases
 - `--world` — World data (NPCs, items, quests, etc.)
 - `--characters` — Player characters and progression
 - `--logs` — Server activity logs
@@ -49,33 +55,47 @@ The `backup-db` command supports these flags:
 
 ::: info Where backups are stored
 The command outputs the backup archive to **standard output** (stdout).  
-The examples above redirect it to a local `backups/` directory. Make sure this directory exists before running the command:
+The examples above redirect it to a local `backups/` directory.
 
-```sh
-mkdir -p backups
-```
+Make sure this directory exists before running the command!
 :::
 
 ### Restoring a backup
 
 To restore from a backup file:
 
-```sh
-./builder/run.sh restore-db < backups/cmangos_2024-01-15_12-30-00.tar.gz
+::: code-group
+
+```sh [All platforms]
+docker compose run --rm -T builder restore-db < backups/cmangos_backup.tar.gz
 ```
+
+```sh [*nix shortcut]
+./builder/run.sh restore-db < backups/cmangos_backup-2026_08_18-01_12_48.tar.gz
+```
+
+:::
 
 ::: danger Destructive operation
 Restoring a backup will **overwrite** the current database contents.  
-Make sure you have a recent backup of your current data before proceeding.
+Make sure you have a recent backup of your current data before proceeding!
 :::
 
 ## Interactive database management
 
-For advanced operations — such as installing custom content, applying specific SQL patches, or running the full database installer menu — use the `manage-db` command:
+For advanced operations — such as installing custom content, applying specific SQL patches or running the full database installer menu — use the `manage-db` command:
 
-```sh
+::: code-group
+
+```sh [All platforms]
+docker compose run --rm builder manage-db
+```
+
+```sh [*nix shortcut]
 ./builder/run.sh manage-db
 ```
+
+:::
 
 This launches the CMaNGOS `InstallFullDB.sh` interactive menu inside the builder container, giving you direct access to all database maintenance options provided by the upstream project.
 
@@ -88,21 +108,13 @@ Choose the one that best suits your needs.
 ### Using phpMyAdmin
 
 phpMyAdmin is included in CMaNGOS Docker but is disabled by default.  
-To run it, you can either start it manually or use the `debug` profile.
+To run it, you can simply use the `debug` profile:
 
-::: code-group
-
-```sh [Start manually]
-docker compose up phpmyadmin
-```
-
-```sh [Use debug profile]
+```sh
 docker compose --profile debug up
 ```
 
-:::
-
-After running one of these commands, visit [`http://localhost:8080`](http://localhost:8080) to access phpMyAdmin's graphical interface.
+After running this command, visit [`http://localhost:8080`](http://localhost:8080) to access phpMyAdmin's graphical interface.
 
 ::: info Default credentials
 Use the database credentials from your `.env` file to log in.  
@@ -111,49 +123,59 @@ The root user is `root` with the password you set in `MYSQL_SUPERPASS`.
 
 ### Using the MariaDB CLI
 
-For command-line access, you can use the `builder` container to run MariaDB commands directly.
+For command-line access, open an interactive shell inside the `builder` container:
 
 ::: code-group
 
-```sh [Linux / Unix / macOS]
-# The builder container has your .env credentials loaded automatically.
-# Use the --password flag with the variable (no space after -p):
-
-./builder/run.sh mariadb -h mariadb -u root -p"$MYSQL_SUPERPASS" classicrealmd -e "SELECT * FROM realmlist;"
-
-# Execute queries from a file
-./builder/run.sh mariadb -h mariadb -u root -p"$MYSQL_SUPERPASS" classicmangos < path/to/queries.sql
+```sh [All platforms]
+docker compose run --rm builder bash
 ```
 
-```bat [Windows Command Prompt]
-:: Execute a single inline query
-docker run -it --rm ^
-           --network "cmangos_default" ^
-           --env MYSQL_SUPERPASS="root00" ^
-    ^
-    ghcr.io/byloth/cmangos/{version}/builder:latest ^
-    mariadb -h mariadb -u root -p"root00" classicrealmd -e "SELECT * FROM realmlist;"
-```
-
-```powershell [Windows PowerShell]
-# Execute a single inline query
-docker run -it --rm `
-           --network "cmangos_default" `
-           --env MYSQL_SUPERPASS="root00" `
-    `
-    ghcr.io/byloth/cmangos/{version}/builder:latest `
-    mariadb -h mariadb -u root -p"root00" classicrealmd -e "SELECT * FROM realmlist;"
+```sh [*nix shortcut]
+./builder/run.sh bash
 ```
 
 :::
 
-::: warning Placeholders
-Replace `{version}` with your expansion keyword (`classic`, `tbc`, or `wotlk`).  
-On Windows, replace `root00` with the actual password from your `.env` file.
+The container already has your `.env` credentials loaded as environment variables, so from that shell you can connect right away:
+
+```sh
+mariadb -h"${MANGOS_DBHOST}" -u"${MYSQL_SUPERUSER}" -p"${MYSQL_SUPERPASS}"
+```
+
+Once connected, you can run any SQL you need:
+
+```sql
+-- Switch to the database you're interested in, for instance:
+USE tbcrealmd;
+
+-- Then you're ready to run all the queries you need, for example:
+SELECT * FROM realmlist;
+```
+
+When you're done, type `exit` to leave the MariaDB client and `exit` again to leave the container.
+
+::: tip One-liners for scripting
+On WSL, macOS and Linux, you can run non-interactive queries in a single command:
+
+```sh
+# Execute a single inline query, for instance:
+./builder/run.sh bash -c \
+    'mariadb -h"${MANGOS_DBHOST}" -u"${MYSQL_SUPERUSER}" -p"${MYSQL_SUPERPASS}" tbcrealmd -e "SELECT * FROM realmlist;"'
+
+# Execute queries from a file, for example:
+./builder/run.sh bash -c \
+    'mariadb -h"${MANGOS_DBHOST}" -u"${MYSQL_SUPERUSER}" -p"${MYSQL_SUPERPASS}" tbcmangos' < path/to/queries.sql
+```
+:::
+
+::: warning Database names
+The examples above use the `tbc` databases.  
+Adjust the database name to your expansion keyword (`classic`, `tbc` or `wotlk`) — e.g. `classicrealmd`, `wotlkmangos`, ...
 :::
 
 ::: tip Using mysql vs mariadb commands
-The builder image includes MariaDB 11.x client tools. The canonical commands are `mariadb` and `mariadb-dump`.  
+The builder image includes MariaDB client tools: the canonical commands are `mariadb` and `mariadb-dump`.  
 A `mysql` symlink may also be available, but `mariadb` is the preferred command for forward compatibility.
 :::
 
@@ -168,27 +190,4 @@ CMaNGOS uses four separate databases for each expansion:
 | `{expansion}logs` | Server logs (chat, trades, GM commands, etc.) |
 | `{expansion}realmd` | Account and realm data (login credentials, realm list, bans, etc.) |
 
-Where `{expansion}` is one of: `classic`, `tbc`, or `wotlk`.
-
-## Common issues
-
-### "No such volume: cmangos_mangosd_data"
-
-If you see this error when running `./builder/run.sh`, make sure the Docker volume has been created:
-
-```sh
-docker volume create cmangos_mangosd_data
-```
-
-This volume is required before you can extract game data, initialize the database, or create backups.
-
-### Interactive commands hang or fail
-
-Commands like `init-db`, `extract`, and `update-db --world` require an interactive terminal (TTY) to display confirmation prompts.  
-Always run them from a proper terminal session. If you are scripting or piping, ensure a TTY is allocated:
-
-```sh
-./builder/run.sh init-db
-```
-
-Do not redirect stdin from `/dev/null` or run these commands in non-interactive CI environments without modification.
+Where `{expansion}` is - as usual - one of: `classic`, `tbc` or `wotlk`.
