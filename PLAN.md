@@ -20,7 +20,7 @@ Scope: a web UI for cmangos-docker, per issue #6, built into this repo as a new 
 - **Nuxt 4.5.2** (exact pin; includes CVE-2026-71318 fix) in `web-ui/`. One artifact, TS end-to-end.
 - **BFF pattern**: all privileged access lives in `server/`. Frontend never talks to MariaDB or mangosd directly. Credentials only in server runtime config (env).
 - **No pass-through endpoints.** Every server route validates input, authorizes the session, exposes a minimal explicit surface.
-- **Core adapter per expansion**: `classic`/`tbc` (SRP6v2 with CMaNGOS quirks) vs `wotlk` (sha_pass_hash HEX). Selected by config (`NUXT_CMANGOS_CORE`). All three expansions targeted from day one; the rest of the code never branches on expansion.
+- **Core adapter per expansion**: selected by config (`NUXT_CMANGOS_CORE`). Update 2026-08-24: current CMaNGOS master uses SRP6 (v/s) on ALL THREE cores — wotlk realmd's AuthSocket queries v,s,token and its SRP6.cpp is identical to tbc's. sha_pass_hash only matters for older/legacy deployments; keep the adapter seam, but all three expansions default to SRP6v2. All three expansions targeted from day one; the rest of the code never branches on expansion.
 - **DB access**: query builder only (Drizzle or Kysely — decide at scaffold time; lean Drizzle). **No migrations, ever** — schema is owned by CMaNGOS. Dedicated least-privilege DB user for the web service: `SELECT` broadly, `INSERT/UPDATE` only on the auth `account` table.
 - **SOAP** (mangosd) is the channel for every mutating admin op (ban, password reset as admin, shutdown with in-game warning). Hard dependency on **issue #27** (build flag, exposed port, env credentials). v1 works without it; admin features land after #27.
 - **Auth/session**: the game's own account *is* the identity. Login = recompute verifier from submitted password, compare with stored `v` (adapter-specific). Session: signed httpOnly cookie (Nuxt session utils), no JWT needed v1.
@@ -61,3 +61,13 @@ Persistence of our own (password-reset tokens, 2FA TOTP secrets). Options: tiny 
 - Phase 2 delete-account semantics.
 - Persistence decision (reset tokens / 2FA) — at that point.
 - Whether the web UI ships in the default compose profile or stays opt-in.
+
+## Progress log
+
+### 2026-08-24 — Phase 1, session 1 (findings, no code yet)
+- Env: this box has bun 1.3.14 + node 24, NO docker, no mysql client → live-DB integration tests impossible here; unit tests only. Endpoint runtime behavior against real MariaDB will be UNTESTED until homelab — must be stated in PR/report.
+- DB names (from Dockerfile): `<expansion>realmd`, `<expansion>mangos`, `<expansion>characters`, `<expansion>logs` (e.g. `tbcrealmd`).
+- `account` DDL fetched from cmangos master (classic/tbc/wotlk — byte-identical): id, username(32) UNIQUE, gmlevel, sessionkey longtext, v longtext, s longtext, email text, joindate, lockedIp, failed_logins, locked, last_module, module_day, active_realm_id, expansion, mutetime, locale, os, platform, token, flags. No sha_pass_hash / last_ip / last_login columns.
+- SRP6 verifier algorithm cross-checked vs src/shared/Auth/SRP6.cpp (wotlk+tbc identical): x = sha1(LE_bytes(salt) || sha1(USER:PASS)) read as big-endian int; v = g^x mod N. Matches server/utils/srp6.ts on x and v.
+- OPEN (next step, blocks register/login): how v is serialized for DB storage. SRP6 stores via BigNumber::AsHexStr (big-endian, unpadded) but srp6.ts currently returns reversed (little-endian) hex — likely wrong. Account creation lives in mangosd (account create console cmd / AccountMgr), NOT realmd: grep cmangos/mangos-tbc src/game for INSERT INTO account + AsHexStr. Fix srp6.ts + tests first.
+- Decision: this docs commit stays local until the first code batch joins it (push coherent batches — he wants visibility, not noise).
