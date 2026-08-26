@@ -71,3 +71,13 @@ Persistence of our own (password-reset tokens, 2FA TOTP secrets). Options: tiny 
 - SRP6 verifier algorithm cross-checked vs src/shared/Auth/SRP6.cpp (wotlk+tbc identical): x = sha1(LE_bytes(salt) || sha1(USER:PASS)) read as big-endian int; v = g^x mod N. Matches server/utils/srp6.ts on x and v.
 - OPEN (next step, blocks register/login): how v is serialized for DB storage. SRP6 stores via BigNumber::AsHexStr (big-endian, unpadded) but srp6.ts currently returns reversed (little-endian) hex — likely wrong. Account creation lives in mangosd (account create console cmd / AccountMgr), NOT realmd: grep cmangos/mangos-tbc src/game for INSERT INTO account + AsHexStr. Fix srp6.ts + tests first.
 - Decision: this docs commit stays local until the first code batch joins it (push coherent batches — he wants visibility, not noise).
+
+### 2026-08-24 — Phase 1, session 2 (SRP6 serialization fixed, committed as f025d09)
+- RESOLVED the open question from session 1: `AccountMgr::CreateAccount` stores `BN_bn2hex(v)` / `BN_bn2hex(s)` — big-endian, UPPERCASE, unpadded. realmd parses with `BN_hex2bn` (case/padding-insensitive). Session-1 suspicion confirmed: little-endian reversed hex (the Phase 0 spike's form) would have produced accounts no retail client could log into.
+- `srp6.ts` rewritten and committed (f025d09): salt emitted as 64-char uppercase hex; verifier as big-endian uppercase unpadded hex (length may be < 64 chars — matches the core). Header comment documents the full verified data flow with source file references.
+- x computation confirmed unchanged and correct: `sha1(LE(salt) || LE(sha1(USER:PASS)))` read as big-endian int.
+- Known vector: ADMIN/ADMIN, salt AABB…CCDD → `28AE3C33E905D329A887D26E844AFDE10687C9E283940127D3E1A97A3DD157BB`, computed independently with Python hashlib/pow. 7 bun tests pass.
+- Cross-check vs WoWSimpleRegistration (server_core 5 = CMaNGOS): its cmangos branch (strrev'd LE output) targets Trinity-era schemas with binary/bytea fields; for CMaNGOS's longtext v/s parsed by BN_hex2bn, big-endian hex is the interoperable form — same conclusion as from the C++ source. Noted in passing, not a dependency.
+- WoW registration flows (from WoWSimpleRegistration user.php, user-side reference for the register endpoint): username `[0-9A-Z-_]+`, 2–16 chars; password 4–16; email required + validated; duplicate username/email rejected before insert; INSERT carries username, v, s, email, expansion.
+- Branch state: 2 local commits ahead of fork (1f04704 docs, f025d09 srp6 fix). NOT pushed yet — waiting for a coherent batch (runtime config + Drizzle at minimum).
+- Next: runtime config + .env.example → Drizzle schema (drizzle-orm + mysql2) → auth adapter seam → register/login/logout/me → server status → BlizzLike shell.
