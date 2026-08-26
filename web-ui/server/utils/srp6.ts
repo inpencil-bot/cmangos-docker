@@ -1,7 +1,30 @@
-// SRP6a implementation for CMaNGOS (Classic/TBC — SRP6v2)
-// Reference parameters from RFC 5054 / CMaNGOS realmd
+// SRP6a salt/verifier generation for CMaNGOS realmd.account — all three cores
+// (classic/tbc/wotlk share an identical SRP6 implementation since the wotlk
+// realm-list rewrite; verified against cmangos master, 2026-08).
+//
+// Sources (CMaNGOS):
+// - src/shared/Auth/SRP6.cpp  — CalculateVerifier
+// - src/game/Accounts/AccountMgr.cpp — CreateAccount / CalculateShaPassHash
+//
+// Exact data flow in the core:
+//   h1  = sha1(USERNAME:PASSWORD)                       (both uppercased)
+//   I   = hex-encode(h1)                                (CalculateShaPassHash)
+//   s   = 32 random bytes
+//   x   = sha1(LE_bytes(s) || LE_bytes(h1))  read as big-endian integer
+//   v   = g^x mod N                                     (N, g per RFC 5054)
+//
+// DB serialization (what realmd/account expect back):
+//   s → AsHexStr() = BN_bn2hex: big-endian, UPPERCASE, unpadded
+//   v → AsHexStr() = BN_bn2hex: big-endian, UPPERCASE, unpadded
+// Both are parsed with SetHexStr → BN_hex2bn, so case/padding don't matter
+// for round-trip — but we emit the exact form the core emits.
+//
+// Sanity check, from the protocol: realmd sends B = (k*v + g^b) mod N to the
+// client. If v were stored little-endian, B would be garbage to a retail
+// client. Big-endian storage is the only form that interoperates.
 
-const N_HEX = '894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7'
+const N_HEX =
+  '894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7'
 const G_HEX = '07'
 
 export const N = BigInt('0x' + N_HEX)
@@ -42,22 +65,20 @@ function stringToBytes(s: string): Uint8Array {
 }
 
 /**
- * Generate a random 32-byte salt as a hex string.
+ * Generate a random 32-byte salt, serialized as CMaNGOS stores it:
+ * big-endian uppercase hex (BN_bn2hex of the random BigNumber).
  */
 export function generateSalt(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32))
-  return bytesToHex(bytes)
+  return bytesToHex(bytes).toUpperCase()
 }
 
 /**
  * Compute the SRP6 verifier for CMaNGOS realmd.account.
  *
- * CMaNGOS quirks (observed in core source):
- * - username is uppercased
- * - salt bytes are reversed before use in the hash
- * - the resulting verifier bytes are reversed (little-endian) for DB storage
- *
- * Returns the verifier as a 64-char hex string (little-endian in DB terms).
+ * Returns the verifier serialized as CMaNGOS stores it: big-endian uppercase
+ * hex, unpadded (BN_bn2hex of v). Length may be shorter than 64 chars when
+ * the top bytes of v are zero — that is normal and matches the core.
  */
 export async function generateVerifier(
   username: string,
@@ -68,18 +89,18 @@ export async function generateVerifier(
   const passUpper = password.toUpperCase()
 
   const salt = hexToBytes(saltHex)
-  const saltReversed = reverseBytes(salt)
 
   const h1 = await sha1(stringToBytes(userUpper + ':' + passUpper))
-  const x = await sha1(concatBytes(saltReversed, h1))
+  // CMaNGOS: sha.UpdateData(s.AsByteArray()); sha.UpdateData(mDigest);
+  // where both AsByteArray() and mDigest are little-endian byte order.
+  const xBytes = await sha1(concatBytes(reverseBytes(salt), reverseBytes(h1)))
 
-  const xInt = BigInt('0x' + bytesToHex(x))
+  // x is then read with SetBinary → big-endian integer.
+  const xInt = BigInt('0x' + bytesToHex(xBytes))
   const vInt = modPow(g, xInt, N)
 
-  const vBytes = hexToBytes(vInt.toString(16).padStart(64, '0'))
-  const vReversed = reverseBytes(vBytes)
-
-  return bytesToHex(vReversed)
+  // AsHexStr → BN_bn2hex: big-endian, uppercase, unpadded.
+  return vInt.toString(16).toUpperCase()
 }
 
 /**
