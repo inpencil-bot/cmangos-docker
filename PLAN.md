@@ -81,3 +81,10 @@ Persistence of our own (password-reset tokens, 2FA TOTP secrets). Options: tiny 
 - WoW registration flows (from WoWSimpleRegistration user.php, user-side reference for the register endpoint): username `[0-9A-Z-_]+`, 2–16 chars; password 4–16; email required + validated; duplicate username/email rejected before insert; INSERT carries username, v, s, email, expansion.
 - Branch state: 2 local commits ahead of fork (1f04704 docs, f025d09 srp6 fix). NOT pushed yet — waiting for a coherent batch (runtime config + Drizzle at minimum).
 - Next: runtime config + .env.example → Drizzle schema (drizzle-orm + mysql2) → auth adapter seam → register/login/logout/me → server status → BlizzLike shell.
+
+### 2026-08-26 — Phase 1, session 3 (auth adapter + validation, committed as 8a07b33)
+- Built auth adapter (`server/utils/auth.ts`): SRP6a-only, createCredentials + verifyCredentials, BN_hex2bn-tolerant comparison (BigInt parse, case/padding agnostic), legacy sha_pass_hash seam documented but NOT supported. Adapter selection is `getAuthAdapter(core)` but currently returns srp6a for all three cores — verified 2026-08-24 that all current CMaNGOS master (classic/tbc/wotlk) use SRP6.
+- Built registration validation (`server/utils/validation.ts`): username `[0-9A-Z_-]{2,16}`, password 4–16, email required + simple regex. Uppercases username on validation (CMaNGOS stores uppercase). Returns structured result type, reports all field errors at once, non-string inputs handled safely.
+- 13 new tests across auth.test.ts (6) and validation.test.ts (7). All 49 tests pass (4 suites: srp6, config, auth, validation).
+- Branch state: 6 local commits ahead of fork. NOT pushed yet — still accumulating a coherent Phase 1 batch.
+- Next: POST /api/auth/register endpoint (Drizzle INSERT into realmd.account), then login/logout/me cookie session, then GET /api/server/status, then BlizzLike shell.
