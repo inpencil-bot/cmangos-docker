@@ -49,7 +49,10 @@ function reverseBytes(bytes: Uint8Array): Uint8Array {
 }
 
 async function sha1(data: Uint8Array): Promise<Uint8Array> {
-  const buf = await crypto.subtle.digest('SHA-1', data)
+  // Copy into a plain ArrayBuffer-backed view: TS's BufferSource type
+  // rejects SharedArrayBuffer-backed views.
+  const view = new Uint8Array(data)
+  const buf = await crypto.subtle.digest('SHA-1', view)
   return new Uint8Array(buf)
 }
 

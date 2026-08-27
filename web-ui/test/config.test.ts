@@ -21,7 +21,7 @@ describe('resolveCmangosConfig', () => {
     expect(cfg.characters.user).toBe('mangos')
   })
 
-  test.each(['classic', 'tbc', 'wotlk'] as const)('accepts core %s', (core) => {
+  test.each(['classic', 'tbc', 'wotlk'] as const)('accepts core %s', (core: string) => {
     const cfg = resolveCmangosConfig({ ...valid, core })
     expect(cfg.realmd.database).toBe(`${core}realmd`)
   })

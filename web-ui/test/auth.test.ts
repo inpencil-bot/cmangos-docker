@@ -6,7 +6,7 @@ const adapter = getAuthAdapter('tbc')
 describe('auth adapter (srp6a, all cores)', () => {
   test.each(['classic', 'tbc', 'wotlk'] as const)(
     'core %s maps to the srp6a adapter',
-    (core) => {
+    (core: string) => {
       expect(getAuthAdapter(core).name).toBe('srp6a')
     }
   )

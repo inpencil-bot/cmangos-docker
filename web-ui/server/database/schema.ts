@@ -41,7 +41,8 @@ export const account = mysqlTable(
     v: longtext('v'),
     s: longtext('s'),
     email: text('email'),
-    joindate: datetime('joindate', { mode: 'string' }).notNull().defaultNow(),
+    // DB-owned default NOW(); the web UI never writes it.
+    joindate: datetime('joindate', { mode: 'string' }).notNull(),
     lockedIp: varchar('lockedIp', { length: 30 }).notNull().default('0.0.0.0'),
     failedLogins: int('failed_logins', { unsigned: true }).notNull().default(0),
     locked: tinyint('locked', { unsigned: true }).notNull().default(0),

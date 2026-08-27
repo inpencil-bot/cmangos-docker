@@ -21,7 +21,7 @@ describe('validateRegistration', () => {
     'BAD!CHAR',
     'ACCENTÉ',
     '',
-  ])('rejects username %j', (username) => {
+  ])('rejects username %j', (username: string) => {
     const res = validateRegistration({ ...good, username })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.errors.username).toBeTruthy()
@@ -29,24 +29,24 @@ describe('validateRegistration', () => {
 
   test.each(['AB', 'PLAYER-2', '_UNDERSCORE', '9LIVES'])(
     'accepts username %j',
-    (username) => {
+    (username: string) => {
       expect(validateRegistration({ ...good, username }).ok).toBe(true)
     }
   )
 
-  test.each(['abc', 'a'.repeat(17), ''])('rejects password %j', (password) => {
+  test.each(['abc', 'a'.repeat(17), ''])('rejects password %j', (password: string) => {
     const res = validateRegistration({ ...good, password })
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.errors.password).toBeTruthy()
   })
 
-  test.each(['abcd', 'x'.repeat(16)])('accepts password %j', (password) => {
+  test.each(['abcd', 'x'.repeat(16)])('accepts password %j', (password: string) => {
     expect(validateRegistration({ ...good, password }).ok).toBe(true)
   })
 
   test.each(['plain', 'a@', '@b.cd', 'a b@c.d', ''])(
     'rejects email %j',
-    (email) => {
+    (email: string) => {
       const res = validateRegistration({ ...good, email })
       expect(res.ok).toBe(false)
       if (!res.ok) expect(res.errors.email).toBeTruthy()
