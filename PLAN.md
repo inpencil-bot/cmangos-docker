@@ -88,3 +88,23 @@ Persistence of our own (password-reset tokens, 2FA TOTP secrets). Options: tiny 
 - 13 new tests across auth.test.ts (6) and validation.test.ts (7). All 49 tests pass (4 suites: srp6, config, auth, validation).
 - Branch state: 6 local commits ahead of fork. NOT pushed yet — still accumulating a coherent Phase 1 batch.
 - Next: POST /api/auth/register endpoint (Drizzle INSERT into realmd.account), then login/logout/me cookie session, then GET /api/server/status, then BlizzLike shell.
+
+### 2026-08-27 — Phase 1, session 4 (auth endpoints + session plumbing, committed as a3c6bc9)
+- Built and committed four auth endpoints under `server/api/auth/`:
+  - `register.post.ts`: validates input, checks duplicate username via Drizzle SELECT, computes SRP6 credentials, INSERTs into realmd.account, returns 201 + {id, username, email}
+  - `login.post.ts`: verifies SRP6 v against submitted password, rejects locked accounts, opens sealed-cookie session via h3 useSession
+  - `logout.post.ts`: clears session cookie
+  - `me.get.ts`: returns session identity without DB read
+- Built `server/utils/session.ts`: thin wrapper over h3 useSession with runtime-config-driven password (min 32 chars), maxAge, httpOnly, SameSite=Lax, secure opt-in. Auto-imported in Nitro handlers.
+- Schema fix: joindate documented as DB-owned default, removed `.defaultNow()` drift that could conflict with MariaDB.
+- Type safety: added `bun-types` devDependency, `tsconfig.json` files, defensive copy in srp6.ts before `crypto.subtle.digest` (SharedArrayBuffer guard), test type annotations tightened.
+- All 49 tests pass. Build completes (3.62 MB, 1.03 MB gzip).
+- Branch state: 8 commits ahead of fork. Pushed.
+- Remaining Phase 1: GET /api/server/status (realm online flag + player count), BlizzLike shell (layout, palette, borders/typography). These are the last two items before Phase 1 is complete.
+
+### 2026-08-28 — Phase 1, session 5 (GET /api/server/status, committed as 3b8f349)
+- Built `server/api/server/status.get.ts`: realm online = NOT(realmflags & 0x2) AND uptime row fresh. Freshness = latest `uptime` row for the realm, age(now − starttime) ≤ UpdateUptimeInterval(10min)×60 + 60s buffer (src/game/World/World.cpp). Online count = count(characters where online=1) in `<core>characters`. Response: `{realm:{name,online,onlineCount,maxPlayers}, details:{flaggedOffline,staleUptime}}`; 404 when realmlist is empty.
+- Decisions taken (mine, listed for the report): single-realm assumption — first `realmlist` row (CMaNGOS docker stack runs one realm); staleness threshold fixed at 10min+60s rather than reading UpdateUptimeInterval from config; `details` block exposes the two offline sources separately so the frontend can say WHY it's down.
+- Phase 1 backend is now functionally complete: config, Drizzle layer, SRP6 adapter, register/login/logout/me, status. Remaining Phase 1: BlizzLike frontend shell (item 9).
+- Known issues, NOT blocking, to fix in the shell session or a cleanup commit: (a) vue-tsc TS2769 in register.post.ts — after removing `.defaultNow()`, Drizzle's insert type demands `joindate`; add `joindate: sql\`NOW()\`` or a typing workaround (build/nitro is green, tests green — type-only); (b) root vue-tsc run can't resolve `bun:test` imports in test files (bun test itself passes — tsconfig types config issue).
+- Branch state: 9 commits ahead of fork, pushed this session + PR #44 updated. Live-MariaDB integration remains UNTESTED (no docker/mysql on this box) — stated in the PR.
