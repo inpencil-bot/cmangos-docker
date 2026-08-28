@@ -8,6 +8,7 @@
 // - sql/base/realmd.sql      → account, realmlist, uptime
 // - sql/base/characters.sql  → characters
 
+import { sql } from 'drizzle-orm'
 import {
   bigint,
   char,
@@ -41,8 +42,13 @@ export const account = mysqlTable(
     v: longtext('v'),
     s: longtext('s'),
     email: text('email'),
-    // DB-owned default NOW(); the web UI never writes it.
-    joindate: datetime('joindate', { mode: 'string' }).notNull(),
+    // DB-owned default (DDL: DEFAULT NOW(), verified 2026-08-28). Declared
+    // so the Drizzle insert type treats the column as optional — the
+    // descriptor only mirrors the DDL; the web UI never writes it and no
+    // DDL is ever generated from this file.
+    joindate: datetime('joindate', { mode: 'string' })
+      .notNull()
+      .default(sql`NOW()`),
     lockedIp: varchar('lockedIp', { length: 30 }).notNull().default('0.0.0.0'),
     failedLogins: int('failed_logins', { unsigned: true }).notNull().default(0),
     locked: tinyint('locked', { unsigned: true }).notNull().default(0),

@@ -1,12 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 import { getAuthAdapter } from '../server/utils/auth'
+import type { CmangosCore } from '../server/database/config'
 
 const adapter = getAuthAdapter('tbc')
 
 describe('auth adapter (srp6a, all cores)', () => {
   test.each(['classic', 'tbc', 'wotlk'] as const)(
     'core %s maps to the srp6a adapter',
-    (core: string) => {
+    (core: CmangosCore) => {
       expect(getAuthAdapter(core).name).toBe('srp6a')
     }
   )
