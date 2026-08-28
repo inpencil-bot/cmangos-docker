@@ -121,3 +121,10 @@ Persistence of our own (password-reset tokens, 2FA TOTP secrets). Options: tiny 
 - Noted for a later cleanup (non-blocking): in dev mode, unhandled Drizzle query failures surface query text in the 500 statusMessage; production sanitizes. Consider wrapping unexpected DB errors in generic 500s across endpoints when the live-DB pass happens.
 - Branch pushed; Draft PR #44 updated: Phase 1 COMPLETE. Live-MariaDB integration remains UNTESTED (no docker/mysql on this box) — first homelab run must exercise register→login→status against real MariaDB.
 - Phase 1 done: config, Drizzle layer, SRP6 adapter, register/login/logout/me, server status, BlizzLike shell. Next phases per Build order: 2 (self-service), 3 (admin, blocked on #27), 4 (packaging). Matteo picks.
+
+### 2026-08-28 — Phase 1, session 8 (review fix: nav Create Account contrast — fix commit 49db4e9)
+- Matteo reviewed Draft PR #44 (~16:05): strong praise for the shell, one defect — the header nav "Create account" NuxtLink reuses `.btn` (gold gradient), but `.site-nav a` / `a:hover` / `a.router-link-active` overrode its text color to --mist / --gold-bright: mist-on-gold, illegible. Hero button unaffected (no .site-nav ancestor); logout `<button class="btn--ghost">` never affected (not an anchor).
+- Fix (49db4e9): scoped all three nav selectors with `:not(.btn)` in main.css. Buttons in the nav keep their own colors AND typography again (the unscoped rule had also imposed the nav-link font-size/letter-spacing on the button). No `!important`, per his categorical ban.
+- Verified: 49/49 bun tests · vue-tsc exit 0 (only a pre-existing vue-router volar plugin-resolution warning, unrelated) · build green · compiled CSS carries only the scoped selectors, zero unscoped leftovers · production SSR smoke: / → 200, header renders the Create account button link.
+- Open question flagged to Matteo: the prefers-reduced-motion reset block (main.css ~L495) uses two `!important`s — the standard a11y pattern; his ban was absolute. Kept for now (removing silently degrades a11y); awaiting his ruling: exception or per-selector overrides.
+- Branch pushed to fork; PR #44 review-fix comment added.
