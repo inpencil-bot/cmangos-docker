@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   },
   srcDir: '.',
   serverDir: './server',
+  css: ['~/assets/css/main.css'],
   runtimeConfig: {
     // Server-only. Every key is overridable at runtime via NUXT_* env vars
     // (nested keys map to underscores: cmangos.db.host ← NUXT_CMANGOS_DB_HOST).
