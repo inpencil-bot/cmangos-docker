@@ -154,6 +154,13 @@ services:
       PMA_USER: root
       PMA_PASSWORD: "${MYSQL_SUPERPASS}"
 
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:80/"]
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
     networks:
       - default
 
