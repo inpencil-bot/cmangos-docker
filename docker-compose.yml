@@ -131,6 +131,7 @@ services:
 
     volumes:
       - mangosd_data:/var/lib/mangos:ro
+      - ./runner/config:/opt/mangos/conf:ro
 
   phpmyadmin:
     profiles:
