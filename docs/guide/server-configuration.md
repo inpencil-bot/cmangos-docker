@@ -13,11 +13,35 @@ Your custom settings go in files located in the `runner/config/` directory:
 |------|---------|
 | `mangosd.conf` | World server settings (gameplay, rates, features) |
 | `realmd.conf` | Login server settings (authentication, security) |
+| `ahbot.conf` | [Auction House Bot](/guide/customization#auction-house-bot) settings |
+| `aiplayerbot.conf` | [PlayerBots](/guide/customization#playerbots) settings |
+| `anticheat.conf` | [AntiCheat](/guide/customization#anticheat) settings |
+
+Every time a container starts, its entrypoint copies the default `<file>.dist` shipped in the image and applies each `Property = value` line of your file on top of it: the matching line is replaced, or the property is appended if the `.dist` file doesn't have it.
 
 ::: tip Override principle
 You don't need to copy the entire default configuration.  
-Just add the specific properties you want to change; all other settings use CMaNGOS defaults.
+Just add the specific properties you want to change; all other settings keep the defaults of the `.dist` file.
 :::
+
+::: warning Every file needs its `.dist`
+`ahbot.conf`, `aiplayerbot.conf` and `anticheat.conf` are optional: if you delete one, the entrypoint simply skips it.  
+But a file in `runner/config/` must match a `.dist` file in the image: if the image has no `<file>.dist` for it, the container stops with an error.
+:::
+
+### What the shipped files set
+
+The files in `runner/config/` are not empty: out of the box, they set these values.
+
+| File | Settings |
+|------|----------|
+| `mangosd.conf` | `GameType = 0`, `RealmZone = 8`, `RabbitDay = 954547200`, `Motd = "Benvenuto su Azeroth!"` |
+| `realmd.conf` | None (comments only) |
+| `ahbot.conf` | `AhBot.Enabled = 1`, `AuctionHouseBot.Seller.Enabled = 0`, `AuctionHouseBot.Buyer.Enabled = 0` |
+| `aiplayerbot.conf` | `AiPlayerbot.Enabled = 1`, `AiPlayerbot.RandomBotAutologin = 0` |
+| `anticheat.conf` | `Enable = 0`, `Movement.SpeedHack.Enable = 0`, `Movement.BadFallReset.Enable = 0`, `Antispam.Enable = 0`, `Warden.Enable = 0` |
+
+Change or remove any of them like any other setting.
 
 ## World server configuration
 
@@ -45,7 +69,7 @@ Motd = "Welcome to my server!"
 | Property | Default | Description |
 |----------|---------|-------------|
 | `GameType` | `0` | Server type displayed in realm list |
-| `RealmZone` | `1` | Timezone/region for the realm |
+| `RealmZone` | `1` (the shipped `mangosd.conf` sets `8`) | Timezone/region for the realm |
 
 **GameType values:**
 - `0` — Normal (PvE)
@@ -102,7 +126,7 @@ To give new characters 10 gold: `StartPlayerMoney = 100000`
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `Motd` | (empty) | Message of the Day shown on login |
+| `Motd` | `"Benvenuto su Azeroth!"` (set by the shipped `mangosd.conf`) | Message of the Day shown on login |
 
 **Example:**
 ```ini
@@ -128,7 +152,7 @@ Edit `runner/config/realmd.conf` to customize authentication and security settin
 | `WrongPass.MaxCount` | `0` | Max failed login attempts (`0` = unlimited) |
 | `WrongPass.BanTime` | `600` | Ban duration in seconds after max failures |
 | `WrongPass.BanType` | `0` | `0` = Ban IP, `1` = Ban account |
-| `MaxPingTime` | `30` | Disconnect after this many minutes of inactivity |
+| `MaxPingTime` | `30` | Minutes between two pings to the database |
 
 **Example — Ban IP for 1 hour after 5 failed attempts:**
 ```ini
@@ -279,19 +303,14 @@ The client connects to the login server, sees the realm, but can't connect to th
 
 ## Applying configuration changes
 
-After modifying configuration files:
+Configuration files are read at startup, so a restart is required for changes to take effect.  
+After modifying them, restart the two servers:
 
-1. **Stop the server:**
-   ```sh
-   docker compose down
-   ```
+```sh
+docker compose restart mangosd realmd
+```
 
-2. **Start the server:**
-   ```sh
-   docker compose up
-   ```
-
-Configuration files are read at startup, so a restart is required for changes to take effect.
+Each container rebuilds its configuration from your files every time it starts, so there's no need to recreate it.
 
 ::: tip Database changes
 Changes to the `realmlist` table take effect immediately — no server restart needed. Players may need to re-login to see updated realm information.

@@ -183,8 +183,7 @@ Connected players may need to relog or move to a new zone to see updates.
 Most configuration changes require a server restart:
 
 ```sh
-docker compose down
-docker compose up -d
+docker compose restart mangosd realmd
 ```
 
 Database changes (SQL queries, event updates) take effect immediately and do not require a restart.
