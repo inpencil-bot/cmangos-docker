@@ -197,10 +197,12 @@ Add a daily backup at 3 AM:
 ::: warning Backups also pile up inside the volume
 Besides streaming the archive to standard output, each `backup-db` run leaves a second copy inside the `cmangos_mangosd_data` volume, under `backups/<timestamp>/`. With a daily cron job, those copies accumulate and the volume [grows unboundedly](/guide/docker-volumes#volume-grows-unexpectedly-large).
 
-Prune them periodically — for example, by adding this line to `backup.sh` right after the backup command:
+That copy is **not** a backup: `docker compose down -v` or `docker volume rm cmangos_mangosd_data` deletes it together with everything else in the volume. Only the archives written to the host `backups/` directory count.
+
+Prune the in-volume copies periodically — for example, by adding this line to `backup.sh` right after the backup command:
 
 ```sh
-docker compose run --rm -T builder bash -c "find /home/mangos/data/backups -type f -mtime +30 -delete"
+docker compose run --rm -T builder bash -c "find /home/mangos/data/backups -mindepth 1 -maxdepth 1 -type d -mtime +30 -exec rm -rf {} +"
 ```
 :::
 
