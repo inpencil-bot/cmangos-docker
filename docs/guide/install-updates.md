@@ -103,13 +103,13 @@ To see which version of CMaNGOS your images were built from, inspect the image l
 
 ```sh
 # Runner image
-docker inspect ghcr.io/byloth/cmangos/{version}:latest --format='{{index .Config.Labels "net.cmangos.mangos-{version}.revision"}}'
+docker inspect ghcr.io/byloth/cmangos/{version}:{tag} --format='{{index .Config.Labels "net.cmangos.mangos-{version}.revision"}}'
 
 # Builder image
-docker inspect ghcr.io/byloth/cmangos/{version}/builder:latest --format='{{index .Config.Labels "net.cmangos.mangos-{version}.revision"}}'
+docker inspect ghcr.io/byloth/cmangos/{version}/builder:{tag} --format='{{index .Config.Labels "net.cmangos.mangos-{version}.revision"}}'
 ```
 
-As always, replace `{version}` with your expansion keyword (`classic`, `tbc` or `wotlk`).
+As always, replace `{version}` with your expansion keyword (`classic`, `tbc` or `wotlk`) and `{tag}` with the `CMANGOS_VERSION` from your `.env` file (`latest` if you didn't set it).
 
 The output is the upstream CMaNGOS commit SHA that the image was built from.  
 You can compare it with the [upstream repository](https://github.com/cmangos) to see how current your installation is.
