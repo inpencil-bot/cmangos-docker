@@ -21,20 +21,37 @@ The server reads them at startup and merges your overrides with the built-in def
 The [PlayerBots](https://github.com/cmangos/playerbots) module adds AI-controlled characters to your world.  
 They can fill battlegrounds, roam the open world or even act as alts you command directly.
 
-Enable the module by editing `runner/config/aiplayerbot.conf`:
+The module is **enabled by default**: the shipped `runner/config/aiplayerbot.conf` already contains:
 
 ```ini
 AiPlayerbot.Enabled = 1
 ```
 
-By default, random bots will not auto-login. To populate your server with roaming bots:
+To turn it off, set it to `0` and [restart the server](#applying-changes).
+
+:::: danger Random bots can crash the server
+With the upstream defaults (`AiPlayerbot.MinRandomBots` = `AiPlayerbot.MaxRandomBots` = `1000`), mangosd was seen to crash with a segmentation fault about **110 seconds after startup** — see upstream [cmangos/issues#3912](https://github.com/cmangos/issues/issues/3912).  
+That's why the shipped `aiplayerbot.conf` keeps random bots from logging in:
+
+```ini
+AiPlayerbot.RandomBotAutologin = 0
+```
+
+If you want to populate your server with roaming bots anyway, turn autologin on **together with** the mitigation used on the maintainer's production server — fewer bots, none logged in at startup and only a few logins at a time:
 
 ```ini
 AiPlayerbot.RandomBotAutologin = 1
+AiPlayerbot.MinRandomBots = 200
+AiPlayerbot.MaxRandomBots = 200
+AiPlayerbot.RandomBotLoginAtStartup = 0
+AiPlayerbot.RandomBotsMaxLoginsPerInterval = 5
 ```
+::::
 
 :::: warning Database requirement
-PlayerBots requires additional database tables. If you initialized your database before enabling this module, you will need to update it. Use the interactive database manager:
+PlayerBots requires additional `ai_playerbot_*` database tables. `init-db` installs them, but `update-db` (with or without `--world`) **never** applies the PlayerBots SQL: a database initialized without them and only updated since stays without those tables, and mangosd can crash with a segmentation fault at startup.
+
+To install them, launch the interactive database manager:
 
 ::: code-group
 
@@ -48,7 +65,7 @@ docker compose run --rm builder manage-db
 
 :::
 
-Then follow the PlayerBots database installation prompts.
+Then, in the `InstallFullDB.sh` menu, choose option `5` (Advanced DB management) and then option `8`.
 ::::
 
 ::: tip Fine-tuning bot behavior
@@ -64,15 +81,16 @@ For the complete reference, see the upstream configuration files in the [cmangos
 
 The Auction House Bot automatically posts and buys auctions, keeping the economy alive even when few players are online.
 
-Enable it by editing `runner/config/ahbot.conf`:
+The module is **enabled by default**, but the shipped `runner/config/ahbot.conf` keeps both the seller and the buyer off:
 
 ```ini
 AhBot.Enabled = 1
-AuctionHouseBot.Seller.Enabled = 1
-AuctionHouseBot.Buyer.Enabled = 1
+AuctionHouseBot.Seller.Enabled = 0
+AuctionHouseBot.Buyer.Enabled = 0
 ```
 
-You can enable just the seller, just the buyer or both.  
+Set `AuctionHouseBot.Seller.Enabled` and/or `AuctionHouseBot.Buyer.Enabled` to `1` to make it post or buy auctions: you can enable just the seller, just the buyer or both.  
+To turn the module off entirely, set `AhBot.Enabled = 0`.  
 The bot will use default pricing and item selection unless you customize further.
 
 ::: tip Balancing the economy

@@ -84,6 +84,10 @@ docker compose run --rm builder update-db --world
 Don't worry, though: characters data and users progress are preserved.
 ::::
 
+::: warning PlayerBots tables
+`update-db` never installs the PlayerBots database tables, not even with `--world`. If your database doesn't have them yet, see [PlayerBots — Database requirement](/guide/customization#playerbots).
+:::
+
 ### Step 4: Restart the server
 
 After completing all update steps, restart your server:

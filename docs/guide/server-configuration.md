@@ -38,7 +38,7 @@ The files in `runner/config/` are not empty: out of the box, they set these valu
 | `mangosd.conf` | `GameType = 0`, `RealmZone = 8`, `RabbitDay = 954547200`, `Motd = "Benvenuto su Azeroth!"` |
 | `realmd.conf` | None (comments only) |
 | `ahbot.conf` | `AhBot.Enabled = 1`, `AuctionHouseBot.Seller.Enabled = 0`, `AuctionHouseBot.Buyer.Enabled = 0` |
-| `aiplayerbot.conf` | `AiPlayerbot.Enabled = 1`, `AiPlayerbot.RandomBotAutologin = 0` |
+| `aiplayerbot.conf` | `AiPlayerbot.Enabled = 1`, `AiPlayerbot.RandomBotAutologin = 0` (read the [PlayerBots](/guide/customization#playerbots) warning before changing it) |
 | `anticheat.conf` | `Enable = 0`, `Movement.SpeedHack.Enable = 0`, `Movement.BadFallReset.Enable = 0`, `Antispam.Enable = 0`, `Warden.Enable = 0` |
 
 Change or remove any of them like any other setting.
