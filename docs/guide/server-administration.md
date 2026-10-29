@@ -17,8 +17,10 @@ docker attach cmangos-mangosd-1
 
 You'll now see a command prompt where you can type CMaNGOS commands.
 
+If you started mangosd with `./runner/run.sh` instead of `docker compose up`, its container has a different name (`cmangos-mangosd-run-<id>`): find it with `docker ps`.
+
 ::: danger Detaching safely
-**DO NOT** press `Ctrl+C` to exit the console — this will **stop the entire server** and disconnect all players.
+**DO NOT** press `Ctrl+C` to exit the console — this **stops mangosd** and disconnects all players; Docker then restarts it because of its `unless-stopped` restart policy, but every player has been kicked out.
 
 To safely detach from the console without stopping the server:
 1. Press `Ctrl+P`

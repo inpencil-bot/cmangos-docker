@@ -225,8 +225,8 @@ See the [Server Administration](/guide/server-administration) guide for instruct
 
 ## Stop the server
 
-To stop the server gracefully, press `Ctrl+C` in the terminal where it's running.  
-This may take a few seconds as the server saves data and disconnects players.
+To stop the server gracefully, press `Ctrl+C` in the terminal where `docker compose up` is running: Docker Compose stops all the containers.  
+This may take a while, as the world server gets up to two minutes to save data and disconnect players (with older runner images, it is killed at the end of that time instead).
 
 ::: tip Clean shutdown
 To ensure everything is properly stopped:
