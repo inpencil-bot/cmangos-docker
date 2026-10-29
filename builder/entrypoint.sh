@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-readonly SCRIPT_VERSION="1.1.0"
+readonly SCRIPT_VERSION="1.2.0"
 
 set -e
 
@@ -156,13 +156,14 @@ function backup_db()
     readonly HELP_MSG="
 Backups the specified database(s) and then returns the
  result as a single \"tar.gz\" file via standard output.
+If no options are specified, all databases are backed up.
 
 Usage:
     backup-db [OPTIONS...]
 
 Options:
     -a | --all
-        Backups all databases.
+        Backups all databases (same as specifying no options).
 
     -w | --world
         Backups the world database: \"$(info "${MANGOS_WORLD_DBNAME}")\".
@@ -219,34 +220,23 @@ Options:
         shift
     done
 
-    if [[ "${BACKUPS_ALL}" == "true" ]]
+    if [[ "${BACKUPS_ALL}" == "true" ]] && [[ ${#DATABASES[@]} -gt 0 ]]
     then
-        if [[ -n ${DATABASES[@]} ]]
-        then
-            echoerr ""
-            echoerr -e " $(error "ERROR!" --underline)"
-            echoerr -e "  $(error "└") You cannot specify both \"$(info "--all")\" and any other"
-            echoerr -e "     specific database options at the same time."
-            echoerr ""
-            echoerr " Run \"$(info "backup-db --help")\" for more information."
+        echoerr ""
+        echoerr -e " $(error "ERROR!" --underline)"
+        echoerr -e "  $(error "└") You cannot specify both \"$(info "--all")\" and any other"
+        echoerr -e "     specific database options at the same time."
+        echoerr ""
+        echoerr " Run \"$(info "backup-db --help")\" for more information."
 
-            exit 2
-        fi
-
+        exit 2
+    fi
+    if [[ ${#DATABASES[@]} -eq 0 ]]
+    then
         DATABASES=(["world"]="${MANGOS_WORLD_DBNAME}" \
                    ["characters"]="${MANGOS_CHARACTERS_DBNAME}" \
                    ["logs"]="${MANGOS_LOGS_DBNAME}" \
                    ["realmd"]="${MANGOS_REALMD_DBNAME}")
-    fi
-    if [[ -z ${DATABASES[@]} ]]
-    then
-        echoerr ""
-        echoerr -e " $(error "ERROR!" --underline)"
-        echoerr -e "  $(error "└") You must specify at least one database to backup."
-        echoerr ""
-        echoerr " Run \"$(info "backup-db --help")\" for more information."
-
-        exit 3
     fi
 
     local TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
