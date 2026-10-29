@@ -38,7 +38,8 @@ The only ports published to the host â€” and therefore reachable from outside â€
 | `3724` | realmd | Login server |
 | `8085` | mangosd | World server |
 
-Both are configurable through the optional `REALMD_PORT` and `MANGOSD_PORT` variables in your `.env` file.
+Both are configurable through the optional `REALMD_PORT` and `MANGOSD_PORT` variables in your `.env` file.  
+If you change them, the `realmlist` table and the clients must follow: see [Custom ports](/guide/server-configuration#internet-play).
 
 ::: warning phpMyAdmin is a debugging tool
 phpMyAdmin *does* have a port mapping (`8080`) in `docker-compose.yml`, but the service sits behind the `debug` Compose profile, so it is never started unless you explicitly activate that profile. **Do not run the `debug` profile on a production server.**

@@ -274,6 +274,13 @@ For internet play, you must configure your router to forward these ports:
 The setup process varies by router. Search for "port forwarding" + your router model.
 :::
 
+::: info Custom ports
+If you changed the published ports with `REALMD_PORT` or `MANGOSD_PORT` in your `.env` file, forward those instead, and:
+
+- with a custom `MANGOSD_PORT`, set the same value in the `port` field of the `realmlist` table;
+- with a custom `REALMD_PORT`, add it to the client's `realmlist.wtf`, e.g. `set realmlist 192.168.1.100:3725`.
+:::
+
 ### Troubleshooting realm issues
 
 #### Client stuck in realm selection loop
