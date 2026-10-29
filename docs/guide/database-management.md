@@ -116,9 +116,16 @@ docker compose --profile debug up
 
 After running this command, visit [`http://localhost:8080`](http://localhost:8080) to access phpMyAdmin's graphical interface.
 
-::: info Default credentials
-Use the database credentials from your `.env` file to log in.  
-The root user is `root` with the password you set in `MYSQL_SUPERPASS`.
+::: danger No login prompt: anyone who reaches it is root
+phpMyAdmin logs in automatically as the database `root` user (with the `MYSQL_SUPERPASS` password from your `.env` file), without asking for any credentials.  
+By default its port is published on all network interfaces, so **anyone who can reach port `8080` has full control of your databases**.
+
+- Bind it to localhost by setting `PHPMYADMIN_PORT="127.0.0.1:8080"` in your `.env` file.
+- Only start it when you need it, and stop it when you're done:
+
+  ```sh
+  docker compose --profile debug stop phpmyadmin
+  ```
 :::
 
 ### Using the MariaDB CLI

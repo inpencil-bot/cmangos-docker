@@ -43,6 +43,8 @@ Both are configurable through the optional `REALMD_PORT` and `MANGOSD_PORT` vari
 ::: warning phpMyAdmin is a debugging tool
 phpMyAdmin *does* have a port mapping (`8080`) in `docker-compose.yml`, but the service sits behind the `debug` Compose profile, so it is never started unless you explicitly activate that profile. **Do not run the `debug` profile on a production server.**
 
+phpMyAdmin logs in automatically as the database `root` user, with no login prompt: anyone who can reach its port has full control of your databases.
+
 If you really need remote database administration, bind phpMyAdmin to localhost by setting `PHPMYADMIN_PORT="127.0.0.1:8080"` in your `.env` file and access it through an SSH tunnel.
 :::
 
