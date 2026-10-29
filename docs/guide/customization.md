@@ -157,19 +157,20 @@ To apply one:
 
 ::: code-group
 
-```sh [docker compose]
+```sh [All platforms]
 docker compose run --rm -T builder bash -c \
-    'mariadb -h"${MANGOS_DBHOST}" -u"${MYSQL_SUPERUSER}" -p"${MYSQL_SUPERPASS}" classicmangos' < my-custom-patch.sql
+    'mariadb -h"${MANGOS_DBHOST}" -u"${MYSQL_SUPERUSER}" -p"${MYSQL_SUPERPASS}" tbcmangos' < my-custom-patch.sql
 ```
 
 ```sh [*nix shortcut]
 ./builder/run.sh bash -c \
-    'mariadb -h"${MANGOS_DBHOST}" -u"${MYSQL_SUPERUSER}" -p"${MYSQL_SUPERPASS}" classicmangos' < my-custom-patch.sql
+    'mariadb -h"${MANGOS_DBHOST}" -u"${MYSQL_SUPERUSER}" -p"${MYSQL_SUPERPASS}" tbcmangos' < my-custom-patch.sql
 ```
 
 :::
 
-Replace `classicmangos` with your expansion's world database name and `my-custom-patch.sql` with the path to your patch file.  
+Replace `tbcmangos` with your expansion's world database name and `my-custom-patch.sql` with the path to your patch file.  
+On Windows, run the command from the **Command Prompt**: PowerShell doesn't support the `<` redirection.  
 See [Database Management — Querying databases](/guide/database-management#querying-databases) for more details on running SQL against your server.
 
 ### Scheduling in-game events
