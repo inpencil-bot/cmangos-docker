@@ -10,11 +10,7 @@ All the maintenance commands on this page run inside the `builder` container and
 - **All platforms** — the `docker compose run` form; works identically on Windows, macOS and Linux.  
   You don't even need to start the database server first: Docker Compose starts it automatically as a dependency and waits for it to be ready.
 - **\*nix shortcut** — the `./builder/run.sh` wrapper script; WSL, macOS and Linux only.  
-  It expects the database server to be already running:
-
-  ```sh
-  docker compose up -d mariadb
-  ```
+  It runs the same `docker compose run` command under the hood, so it behaves exactly the same way.
 
 ## Backups
 
@@ -46,11 +42,14 @@ On Windows, run these commands from the **Command Prompt**: PowerShell's redirec
 :::
 
 ::: tip Backup options
-The `backup-db` command supports these flags:
-- `--world` — World data (NPCs, items, quests, etc.)
-- `--characters` — Player characters and progression
-- `--logs` — Server activity logs
-- `--realmd` — Realm and account data
+Without any flag, `backup-db` backs up all four databases.  
+To back up only some of them, combine these flags:
+- `-w` / `--world` — World data (NPCs, items, quests, etc.)
+- `-c` / `--characters` — Player characters and progression
+- `-l` / `--logs` — Server activity logs
+- `-r` / `--realmd` — Realm and account data
+
+`-a` / `--all` backs up all databases, exactly like no flags; it cannot be combined with the other flags (the command exits with an error).
 :::
 
 ::: info Where backups are stored
@@ -79,6 +78,11 @@ docker compose run --rm -T builder restore-db < backups/cmangos_backup.tar.gz
 ::: danger Destructive operation
 Restoring a backup will **overwrite** the current database contents.  
 Make sure you have a recent backup of your current data before proceeding!
+:::
+
+::: warning The databases must already exist
+`restore-db` loads each dump into the existing database with the same name: it replaces the tables contained in the dump, leaves any other table as it is and doesn't create the databases.  
+On a fresh install, [initialize the database](/guide/getting-started#initialize-the-database) with `init-db` first, then restore your backup.
 :::
 
 ## Interactive database management
