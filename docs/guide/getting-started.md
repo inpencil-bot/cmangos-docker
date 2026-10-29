@@ -62,12 +62,30 @@ Since it contains sensitive information (like passwords), it cannot be included 
 
 | Variable | Description | Example |
 |----------|-------------|---------|
+| `THREADS` | Compile threads, only used by `cmangos-build.sh` if you build the images yourself | `4` |
 | `MYSQL_SUPERPASS` | Password for the MySQL `root` administrator account | `root00` |
 | `MANGOS_DBUSER` | Username for the application's database connection | `mangos` |
 | `MANGOS_DBPASS` | Password for the application's database connection | `mangos00` |
-| `WOW_CLIENT_DIR` | Full path to your WoW game installation | `D:\Games\WoW` |
-| `WOW_TIMEZONE` | Server timezone ([tz database format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) | `Europe/Rome` |
+| `WOW_CLIENT_DIR` | Full path to your WoW client folder — the one containing the `Data/` directory | `/mnt/c/Program Files/World of Warcraft/` |
+| `WOW_TIMEZONE` | Server timezone ([tz database format](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) | `Europe/Amsterdam` |
 | `WOW_VERSION` | Expansion keyword from the table above | `tbc` |
+
+::: warning `WOW_CLIENT_DIR` must contain `Data/`
+Point `WOW_CLIENT_DIR` at the client folder itself, the one that contains the `Data/` directory — not at `Data/` or at a parent folder.  
+If `Data/` isn't there (or the variable is empty), the [extraction](#extract-game-data) stops with an error.
+
+The example path is a WSL one; use the path format of the system you run Docker from, e.g. `C:\Program Files\World of Warcraft` on Windows or `/home/me/World of Warcraft` on Linux.
+:::
+
+The `.env.example` file also contains a few **optional** variables, commented out; uncomment one only if you need to change its default:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CMANGOS_VERSION` | `latest` | Image tag for the builder and runner images (e.g. a dated tag, see [Rollback](/guide/install-updates#rollback)) |
+| `REALMD_PORT` | `3724` | Host port of the login server |
+| `MANGOSD_PORT` | `8085` | Host port of the world server |
+| `PHPMYADMIN_PORT` | `8080` | Host port of phpMyAdmin; also accepts `ip:port`, e.g. `127.0.0.1:8080` |
+| `*_CPUS_LIMIT` / `*_MEMORY_LIMIT` | see [Use in Production](/guide/use-in-production#docker-resource-limits) | CPU and memory limits for each service |
 
 ::: danger Security notice
 Choose strong, unique passwords for `MYSQL_SUPERPASS` and `MANGOS_DBPASS`.  
