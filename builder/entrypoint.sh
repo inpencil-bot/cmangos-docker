@@ -70,6 +70,17 @@ function install_updates()
 #
 function extract_resources_from_client()
 {
+    if [[ ! -d "${HOME_DIR}/wow-client/Data" ]]
+    then
+        echoerr ""
+        echoerr -e " $(error "ERROR!" --underline)"
+        echoerr -e "  $(error "└") No \"$(info "Data")\" directory found in the mounted client folder."
+        echoerr -e "     \"$(info "WOW_CLIENT_DIR")\" must point to the World of Warcraft"
+        echoerr -e "     client folder (the one containing \"$(info "Data/")\")."
+
+        exit 1
+    fi
+
     cd "${VOLUME_DIR}"
 
     if [[ -f ".resext" ]] || [[ $(ls | grep -c -E "Cameras|dbc|maps|mmaps|vmaps") -gt 0 ]]
