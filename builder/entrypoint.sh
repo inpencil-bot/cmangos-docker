@@ -9,7 +9,7 @@ set -e
 #
 function echoerr()
 {
-    echo ${@} >&2
+    echo "${@}" >&2
 }
 
 function success()
@@ -41,7 +41,7 @@ function error()
 
 function mysql_execute()
 {
-    mariadb "-h${MANGOS_DBHOST}" "-P${MANGOS_DBPORT}" "-u${MYSQL_SUPERUSER}" "-p${MYSQL_SUPERPASS}" ${@}
+    mariadb "-h${MANGOS_DBHOST}" "-P${MANGOS_DBPORT}" "-u${MYSQL_SUPERUSER}" "-p${MYSQL_SUPERPASS}" "${@}"
 }
 function mysql_dump()
 {
@@ -111,7 +111,7 @@ function extract_resources_from_client()
     cp * "${HOME_DIR}/wow-client/"
     cd "${HOME_DIR}/wow-client"
 
-    ./ExtractResources.sh ${@}
+    ./ExtractResources.sh "${@}"
 
     mv Cameras "${VOLUME_DIR}/Cameras"
     mv dbc "${VOLUME_DIR}/dbc"
@@ -396,7 +396,7 @@ case "${1}" in
     extract)
         shift
 
-        extract_resources_from_client ${@}
+        extract_resources_from_client "${@}"
         ;;
     init-db)
         shift
@@ -406,12 +406,12 @@ case "${1}" in
     backup-db)
         shift
 
-        backup_db ${@}
+        backup_db "${@}"
         ;;
     restore-db)
         shift
 
-        restore_db ${@}
+        restore_db "${@}"
         ;;
     manage-db)
         shift
@@ -421,11 +421,11 @@ case "${1}" in
     update-db)
         shift
 
-        update_db ${@}
+        update_db "${@}"
         ;;
     *)
         cd "${HOME_DIR}"
 
-        exec ${@}
+        exec "${@}"
         ;;
 esac
