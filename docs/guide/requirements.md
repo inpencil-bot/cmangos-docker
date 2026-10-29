@@ -9,7 +9,8 @@ These topics won't be covered in this documentation; however, any other software
 ## Docker
 
 [**Docker**](https://www.docker.com/) is the only software required to run this project.  
-With it, also comes [**Docker Compose**](https://docs.docker.com/compose/) <small>(v2)</small>, so no extra steps are needed.
+With it, also comes [**Docker Compose**](https://docs.docker.com/compose/) <small>(v2)</small>, so no extra steps are needed.  
+Make sure it's a recent Compose v2 (check with `docker compose version`): the project's `docker-compose.yml` uses the top-level `name` and `create_host_path` options.
 
 ### Installation
 

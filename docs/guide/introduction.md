@@ -29,13 +29,15 @@ While I won't cover them all (since that isn't the focus of this document), here
   You won't need to install any additional software, compilers or libraries.
 
 - **No wasted disk space:**
-  Docker executables take up around **500–600 MB**, while a typical CMaNGOS Docker image is less than **200 MB**.
+  Docker executables take up around **500–600 MB**, while a typical CMaNGOS Docker image is less than **200 MB**.  
+  Only the builder image, used for setup and maintenance, is bigger: about **1 GB** to download.
 
 - **No wasted time:**
   You won't have to wait for any compilation steps — just download and run immediately.
 
 - **No differences between operating systems:**
-  It doesn't matter what OS you're using: Docker works **everywhere**.
+  It doesn't matter what OS you're using: Docker works **everywhere**.  
+  The images are built for x86-64 (`amd64`) only: on Apple Silicon and other ARM machines, Docker runs them under emulation.
 
 ---
 
