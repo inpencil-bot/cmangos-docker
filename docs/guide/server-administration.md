@@ -67,7 +67,7 @@ account create john secretpass123
 ::: warning Password requirements
 - Passwords are case-sensitive
 - Avoid special characters that might cause issues with the client
-- Players can change their password later using the `account set password` command
+- Players can change their own password in game with `.account password {old_password} {new_password} {new_password}`; from the console, administrators use `account set password`
 :::
 
 ### Account information
