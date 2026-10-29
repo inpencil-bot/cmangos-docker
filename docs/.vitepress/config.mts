@@ -79,7 +79,9 @@ export default defineConfig({
     footer: {
       message: `Released under the
 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer nofollow">
-  CC BY-SA 4.0 License</a>.`,
+  CC BY-SA 4.0 License</a>.<br />
+World of Warcraft® and Blizzard Entertainment® are trademarks of Blizzard Entertainment, Inc.
+This project is not affiliated with or endorsed by Blizzard Entertainment.`,
       copyright: `Copyright © 2014-${new Date().getFullYear()}
 <a href="https://github.com/Byloth">
   Matteo Bilotta</a>.`
