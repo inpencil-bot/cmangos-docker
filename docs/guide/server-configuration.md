@@ -140,7 +140,7 @@ WrongPass.BanType = 0
 ## Realm configuration
 
 The realm configuration tells the game client where to connect and what type of server it is.  
-This information is stored in the `realmlist` table of the `realmd` database.
+This information is stored in the `realmlist` table of the `{expansion}realmd` database (e.g. `tbcrealmd`).
 
 ### Default configuration
 
@@ -169,15 +169,16 @@ First, ensure the database is running:
 docker compose up mariadb -d
 ```
 
-Then run these SQL queries to update the realm:
+Then update the default realm entry with these SQL queries:
 
 ```sql
--- Remove the default entry
-DELETE FROM realmlist WHERE id = 1;
+-- Select your realm database (replace "tbc" with your expansion keyword)
+USE tbcrealmd;
 
--- Insert your custom configuration
-INSERT INTO realmlist (id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel)
-VALUES (1, 'My Server', '192.168.1.100', 8085, 1, 0, 1, 0);
+-- Update the default entry
+UPDATE realmlist
+SET name = 'My Server', address = '192.168.1.100', port = 8085
+WHERE id = 1;
 ```
 
 ::: tip Running queries
@@ -194,8 +195,13 @@ See [Database Management — Querying databases](/guide/database-management#quer
 | `port` | World server port | `8085` (default) |
 | `icon` | Realm type icon | `0`=Normal, `1`=PvP, `4`=Normal, `6`=RP, `8`=RP-PvP |
 | `realmflags` | Status flags | `0`=Online, `2`=Offline |
-| `timezone` | Timezone category | `1`=US, `2`=Korea, `8`=English, etc. |
+| `timezone` | Timezone category | `1`=Development, `2`=United States, `6`=Korea, `8`=English, etc. |
 | `allowedSecurityLevel` | Minimum GM level to connect | `0`=Everyone, `1`+=Staff only |
+
+::: info `icon` and `timezone` follow `mangosd.conf`
+Every time it starts, mangosd overwrites `icon` and `timezone` of its realm with the [`GameType` and `RealmZone`](#server-type) values from `mangosd.conf` (the `timezone` values are the same as `RealmZone`'s).  
+To change them, edit those settings instead of the table.
+:::
 
 ### Common scenarios
 
@@ -204,8 +210,9 @@ See [Database Management — Querying databases](/guide/database-management#quer
 For playing on the same computer:
 
 ```sql
-INSERT INTO realmlist (id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel)
-VALUES (1, 'Local Server', '127.0.0.1', 8085, 1, 0, 1, 0);
+UPDATE realmlist
+SET name = 'Local Server', address = '127.0.0.1', port = 8085
+WHERE id = 1;
 ```
 
 #### LAN play
@@ -213,8 +220,9 @@ VALUES (1, 'Local Server', '127.0.0.1', 8085, 1, 0, 1, 0);
 For playing with others on your local network, use your computer's LAN IP:
 
 ```sql
-INSERT INTO realmlist (id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel)
-VALUES (1, 'LAN Server', '192.168.1.100', 8085, 1, 0, 1, 0);
+UPDATE realmlist
+SET name = 'LAN Server', address = '192.168.1.100', port = 8085
+WHERE id = 1;
 ```
 
 ::: tip Finding your LAN IP
@@ -229,8 +237,9 @@ Look for an address like `192.168.x.x` or `10.0.x.x`.
 For public internet access, use your public IP or domain name:
 
 ```sql
-INSERT INTO realmlist (id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel)
-VALUES (1, 'My Public Server', 'wow.example.com', 8085, 1, 0, 1, 0);
+UPDATE realmlist
+SET name = 'My Public Server', address = 'wow.example.com', port = 8085
+WHERE id = 1;
 ```
 
 ::: warning Port forwarding required

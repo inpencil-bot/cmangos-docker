@@ -196,7 +196,13 @@ To play on your server, you need to configure the WoW client to connect to it.
 
 ### Edit realmlist.wtf
 
-Locate the `realmlist.wtf` file inside your WoW client's `Data` directory and open it with a text editor.
+Locate the `realmlist.wtf` file inside your WoW client folder and open it with a text editor:
+
+| Expansion | Location of `realmlist.wtf` |
+|-----------|-----------------------------|
+| `classic` | Client folder itself, next to `WoW.exe` |
+| `tbc` | `Data/<locale>/`, e.g. `Data/enUS/` |
+| `wotlk` | `Data/<locale>/`, e.g. `Data/enUS/` |
 
 Replace its contents with:
 
@@ -207,6 +213,9 @@ set realmlist 127.0.0.1
 ::: info Remote connections
 If you're connecting from a different computer on your network, replace `127.0.0.1` with the server machine's IP address.  
 For internet connections, you'll need to configure port forwarding on your router.
+
+That's not enough on its own: the server's `realmlist` table also has to point to an address the remote clients can reach — by default it says `127.0.0.1`, so remote clients get stuck in the realm selection.  
+See [Realm configuration](/guide/server-configuration#realm-configuration) to update it.
 :::
 
 ### Create an account

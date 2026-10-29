@@ -219,7 +219,7 @@ server exit
 
 ## Managing accounts via database
 
-For bulk operations or automated account management, you can directly modify the `realmd` database.
+For bulk operations or automated account management, you can directly modify the `{expansion}realmd` database (e.g. `tbcrealmd`).
 
 ### Account table structure
 
