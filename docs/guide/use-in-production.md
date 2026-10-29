@@ -91,7 +91,7 @@ CMaNGOS is single-threaded for world simulation, so **clock speed matters more t
 | Disk | Any SSD | NVMe SSD for database volume |
 | Network | 10 Mbps | 100 Mbps+ symmetric |
 
-The [database volume](/guide/docker-volumes#the-mariadb-data-volume) should live on your fastest disk.  
+The [database volume](/guide/docker-volumes#the-cmangos-mariadb-data-volume) should live on your fastest disk.  
 On Linux, you can inspect where Docker stores volumes:
 
 ```sh

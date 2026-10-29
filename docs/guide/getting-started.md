@@ -81,17 +81,6 @@ Generate a strong random password right here — it only uses characters that ar
 
 Once you're done, save the file and close your text editor.
 
-## Create the data volume
-
-Docker uses what it calls "volumes" to store files. See them as virtual disks.  
-CMaNGOS stores the extracted game data, your database backups and other stuff in a dedicated Docker volume called [`cmangos_mangosd_data`](/guide/docker-volumes).
-
-To create it once, open a terminal or a command prompt and type:
-
-```sh
-docker volume create cmangos_mangosd_data
-```
-
 ## Start the database
 
 Now it's time to start the database server for the first time:
@@ -101,6 +90,11 @@ docker compose up -d mariadb
 ```
 
 Besides launching the database — which we'll need shortly to initialize it — this first `docker compose` command also creates automatically everything the stack needs to run.
+
+::: info No volumes to create
+Your databases, the extracted game data and your database backups are stored in [Docker volumes](/guide/docker-volumes): see them as virtual disks.  
+Docker Compose creates them automatically the first time a service needs them, so there's nothing to do by hand.
+:::
 
 ## Extract game data
 
