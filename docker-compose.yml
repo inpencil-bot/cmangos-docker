@@ -41,6 +41,7 @@ services:
       MANGOS_DBHOST: mariadb
       MANGOS_DBUSER: "${MANGOS_DBUSER}"
       MANGOS_DBPASS: "${MANGOS_DBPASS}"
+      TZ: "${WOW_TIMEZONE}"
 
     networks:
       - default
@@ -48,8 +49,10 @@ services:
     volumes:
       - mangosd_data:/home/mangos/data
       - type: bind
-        source: "${WOW_CLIENT_DIR}"
+        source: "${WOW_CLIENT_DIR:-./wow-client}"
         target: /home/mangos/wow-client
+        bind:
+          create_host_path: true
 
   mangosd:
     image: "ghcr.io/byloth/cmangos/${WOW_VERSION}:${CMANGOS_VERSION:-latest}"
