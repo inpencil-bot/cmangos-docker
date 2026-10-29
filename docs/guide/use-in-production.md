@@ -86,10 +86,12 @@ CMaNGOS is single-threaded for world simulation, so **clock speed matters more t
 
 | Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 4 GB | 8 GB+ |
+| RAM | 4 GB | 12 GB+ |
 | CPU | 2 cores | 4+ cores, 3.0 GHz+ |
 | Disk | Any SSD | NVMe SSD for database volume |
 | Network | 10 Mbps | 100 Mbps+ symmetric |
+
+With the default [resource limits](#docker-resource-limits), the containers may use up to 10.5 GB of RAM in total (mangosd 8 GB, MariaDB 2 GB, realmd 512 MB). On a smaller host, lower the limits to fit.
 
 The [database volume](/guide/docker-volumes#the-cmangos-mariadb-data-volume) should live on your fastest disk.  
 On Linux, you can inspect where Docker stores volumes:
@@ -100,28 +102,25 @@ docker volume inspect cmangos_mariadb_data
 
 ### Docker resource limits
 
-Prevent a runaway process from consuming all host resources by adding limits to `docker-compose.yml`:
+Every long-running service already has CPU and memory limits in `docker-compose.yml`, read from optional variables in your `.env` file — no need to edit the Compose file.  
+Uncomment and change the ones you need (the values below are the defaults):
 
-```yaml
-services:
-  mangosd:
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 512M
-
-  mariadb:
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 1G
+```ini
+MARIADB_CPUS_LIMIT=0
+MARIADB_MEMORY_LIMIT="2g"
+MANGOSD_CPUS_LIMIT=0
+MANGOSD_MEMORY_LIMIT="8g"
+REALMD_CPUS_LIMIT=0
+REALMD_MEMORY_LIMIT="512m"
+PHPMYADMIN_CPUS_LIMIT=0
+PHPMYADMIN_MEMORY_LIMIT="512m"
 ```
 
-Adjust the values based on your player count and available RAM.
+A CPU limit of `0` means "no limit". Adjust the values based on your player count, the number of bots and available RAM, then apply them with `docker compose up -d`.
+
+::: warning Don't starve mangosd
+If mangosd reaches its memory limit, the kernel kills it and Docker restarts it, disconnecting every player. PlayerBots is enabled by default and adds to its memory use: a limit as low as `2g` is likely to get mangosd killed.
+:::
 
 ### Database tuning
 
@@ -267,6 +266,16 @@ If a container exits unexpectedly, inspect its last logs and exit code:
 docker compose logs --tail 50 <service-name>
 docker inspect <container-id> --format='{{.State.ExitCode}}'
 ```
+
+### Restarts and graceful stop
+
+All long-running services use the `unless-stopped` restart policy: if one of them crashes — or the Docker daemon restarts, e.g. after a host reboot — Docker starts it again, unless you stopped it yourself with `docker compose stop` or `docker compose down`.
+
+`mangosd` also has `stop_grace_period: 2m`: on `docker compose stop` or `down`, Docker gives the world server up to two minutes to save and shut down before killing it.
+
+::: info Older runner images
+The graceful stop relies on a runner image whose entrypoint hands the stop signal over to mangosd. With an older image, mangosd doesn't receive it and is killed when the grace period ends.
+:::
 
 ## Legal and ethical considerations
 
